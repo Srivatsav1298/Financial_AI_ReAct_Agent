@@ -1,0 +1,144 @@
+{
+    "questions": [
+      {
+        "id": 1,
+        "category": "simple_fact",
+        "question": "How much do Norwegian families spend on housing per month?",
+        "expected_answer": "~11,332 NOK/month",
+        "requires_reasoning": false
+      },
+      {
+        "id": 2,
+        "category": "simple_fact",
+        "question": "What is the average monthly food budget in Norway?",
+        "expected_answer": "~4,286 NOK/month",
+        "requires_reasoning": false
+      },
+      {
+        "id": 3,
+        "category": "simple_fact",
+        "question": "How much do Norwegians spend on transport per month?",
+        "expected_answer": "Check SSB data",
+        "requires_reasoning": false
+      },
+      {
+        "id": 4,
+        "category": "simple_fact",
+        "question": "What is the average spending on entertainment in Norway?",
+        "expected_answer": "Check SSB data",
+        "requires_reasoning": false
+      },
+      {
+        "id": 5,
+        "category": "simple_fact",
+        "question": "How much do Norwegian households spend on clothing monthly?",
+        "expected_answer": "Check SSB data",
+        "requires_reasoning": false
+      },
+      {
+        "id": 6,
+        "category": "comparison",
+        "question": "Do Norwegians spend more on housing or food?",
+        "expected_answer": "Housing (2.6x more)",
+        "requires_reasoning": true
+      },
+      {
+        "id": 7,
+        "category": "comparison",
+        "question": "Which costs more: transport or entertainment?",
+        "expected_answer": "Transport",
+        "requires_reasoning": true
+      },
+      {
+        "id": 8,
+        "category": "comparison",
+        "question": "Do families spend more on clothing or health?",
+        "expected_answer": "Check and compare",
+        "requires_reasoning": true
+      },
+      {
+        "id": 9,
+        "category": "comparison",
+        "question": "What's the bigger expense: restaurants or clothing?",
+        "expected_answer": "Check and compare",
+        "requires_reasoning": true
+      },
+      {
+        "id": 10,
+        "category": "comparison",
+        "question": "Is communication or entertainment more expensive?",
+        "expected_answer": "Entertainment",
+        "requires_reasoning": true
+      },
+      {
+        "id": 11,
+        "category": "multi_step",
+        "question": "If a family earns 50,000 NOK per month, what percentage goes to housing?",
+        "expected_answer": "~22.7% (11,332/50,000)",
+        "requires_reasoning": true
+      },
+      {
+        "id": 12,
+        "category": "multi_step",
+        "question": "How much do families spend on housing and food combined per month?",
+        "expected_answer": "~15,618 NOK (11,332 + 4,286)",
+        "requires_reasoning": true
+      },
+      {
+        "id": 13,
+        "category": "multi_step",
+        "question": "What's the ratio of housing costs to food costs?",
+        "expected_answer": "~2.6:1",
+        "requires_reasoning": true
+      },
+      {
+        "id": 14,
+        "category": "multi_step",
+        "question": "If someone wants to save 20% of 40,000 NOK monthly income, how does that compare to average housing costs?",
+        "expected_answer": "Savings (8,000) < Housing (11,332)",
+        "requires_reasoning": true
+      },
+      {
+        "id": 15,
+        "category": "multi_step",
+        "question": "What percentage of total spending goes to food?",
+        "expected_answer": "~11.8% (4,286/36,292)",
+        "requires_reasoning": true
+      },
+      {
+        "id": 16,
+        "category": "context_dependent",
+        "question": "Is 15,000 NOK per month a reasonable housing budget in Norway?",
+        "expected_answer": "Yes, above average of 11,332",
+        "requires_reasoning": true
+      },
+      {
+        "id": 17,
+        "category": "context_dependent",
+        "question": "If I'm spending 8,000 NOK on food monthly, is that above or below average?",
+        "expected_answer": "Above average (avg is 4,286)",
+        "requires_reasoning": true
+      },
+      {
+        "id": 18,
+        "category": "context_dependent",
+        "question": "What's a realistic total monthly budget for a Norwegian household?",
+        "expected_answer": "~36,292 NOK based on average",
+        "requires_reasoning": true
+      },
+      {
+        "id": 19,
+        "category": "aggregation",
+        "question": "What is the total average household spending per month?",
+        "expected_answer": "~36,292 NOK",
+        "requires_reasoning": false
+      },
+      {
+        "id": 20,
+        "category": "aggregation",
+        "question": "What are the three largest spending categories in Norway?",
+        "expected_answer": "Housing, Food, Transport",
+        "requires_reasoning": true
+      }
+    ]
+  }
