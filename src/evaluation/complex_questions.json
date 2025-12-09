@@ -1,0 +1,296 @@
+{
+    "metadata": {
+        "title": "Complex Financial Reasoning Evaluation Questions",
+        "description": "Non-trivial questions requiring multi-step analysis, optimization, and personalized recommendations",
+        "created": "2025-12-07",
+        "categories": [
+            "budget_optimization",
+            "lifestyle_affordability",
+            "financial_health",
+            "major_purchases",
+            "savings_strategy"
+        ]
+    },
+    "questions": [
+        {
+            "id": 1,
+            "category": "budget_optimization",
+            "complexity": "high",
+            "question": "I earn 45,000 NOK per month and currently spend 15,000 on housing, 8,000 on food, 6,000 on transport, and 3,000 on entertainment. I want to save 10,000 NOK per month to buy a house. What specific changes should I make to my budget?",
+            "expected_reasoning_steps": [
+                "Calculate current total expenses and savings",
+                "Identify gap between current and desired savings",
+                "Get Norwegian average spending for comparison",
+                "Optimize budget allocation using advanced tools",
+                "Provide specific category-by-category recommendations"
+            ],
+            "why_nontrivial": "Requires multi-factor optimization, trade-off analysis, and specific actionable recommendations based on Norwegian norms"
+        },
+        {
+            "id": 2,
+            "category": "financial_health",
+            "complexity": "high",
+            "question": "I earn 55,000 NOK per month. My expenses are: housing 18,000, food 7,000, transport 5,000, entertainment 3,000, other 4,000. Am I financially healthy? What are my biggest risks?",
+            "expected_reasoning_steps": [
+                "Analyze budget health using multi-factor scoring",
+                "Detect spending anomalies vs Norwegian averages",
+                "Calculate savings rate and compare to recommendations",
+                "Identify specific financial risks",
+                "Provide prioritized recommendations"
+            ],
+            "why_nontrivial": "Requires comprehensive health assessment, statistical anomaly detection, and risk prioritization"
+        },
+        {
+            "id": 3,
+            "category": "lifestyle_affordability",
+            "complexity": "high",
+            "question": "I want to live in Oslo with housing costs of 20,000 NOK/month, spend 10,000 on food and dining, 7,000 on transport (own a car), 5,000 on entertainment, and save 20% of my income. What salary do I need?",
+            "expected_reasoning_steps": [
+                "Calculate total desired expenses",
+                "Calculate required income for 20% savings rate",
+                "Compare desired lifestyle to Norwegian averages",
+                "Assess affordability at different income levels",
+                "Provide income target and alternatives"
+            ],
+            "why_nontrivial": "Requires reverse calculation, lifestyle assessment, and feasibility analysis"
+        },
+        {
+            "id": 4,
+            "category": "major_purchases",
+            "complexity": "high",
+            "question": "I want to buy a 300,000 NOK car. I earn 50,000 NOK per month, have 100,000 NOK saved, and my monthly expenses are 35,000 NOK. Should I buy it now, finance it, or save longer?",
+            "expected_reasoning_steps": [
+                "Evaluate current financial situation",
+                "Calculate time to save for full purchase",
+                "Analyze financing options and costs",
+                "Assess impact on financial health",
+                "Compare options and recommend best approach"
+            ],
+            "why_nontrivial": "Requires multi-period analysis, financing calculations, and risk-benefit assessment"
+        },
+        {
+            "id": 5,
+            "category": "savings_strategy",
+            "complexity": "high",
+            "question": "I earn 60,000 NOK per month and spend 16,000 on housing, 9,000 on food, 7,000 on transport, 5,000 on entertainment, and 4,000 on other expenses. How much could I realistically save per month if I optimize my budget?",
+            "expected_reasoning_steps": [
+                "Calculate current savings",
+                "Identify optimization opportunities in each category",
+                "Compare to Norwegian averages",
+                "Calculate savings potential with difficulty levels",
+                "Provide implementation roadmap"
+            ],
+            "why_nontrivial": "Requires opportunity analysis, prioritization, and phased implementation planning"
+        },
+        {
+            "id": 6,
+            "category": "budget_optimization",
+            "complexity": "high",
+            "question": "My family of 4 earns 80,000 NOK per month. We spend 25,000 on housing, 12,000 on food, 8,000 on transport, 6,000 on entertainment, and 5,000 on other expenses. We want to save for our children's education. What's the maximum we can save monthly while maintaining a comfortable lifestyle?",
+            "expected_reasoning_steps": [
+                "Analyze current budget health",
+                "Calculate savings potential",
+                "Optimize budget allocation",
+                "Balance family needs with savings goals",
+                "Provide specific recommendations"
+            ],
+            "why_nontrivial": "Requires family-specific considerations, multi-objective optimization, and long-term planning"
+        },
+        {
+            "id": 7,
+            "category": "financial_health",
+            "complexity": "medium",
+            "question": "I spend 22,000 NOK per month on housing (50% of my 44,000 NOK income), 6,000 on food, 4,000 on transport, and 2,000 on entertainment. What are the red flags in my budget?",
+            "expected_reasoning_steps": [
+                "Detect spending anomalies",
+                "Identify housing burden issue",
+                "Calculate savings rate",
+                "Flag critical risks",
+                "Provide urgent recommendations"
+            ],
+            "why_nontrivial": "Requires anomaly detection, risk assessment, and prioritized interventions"
+        },
+        {
+            "id": 8,
+            "category": "lifestyle_affordability",
+            "complexity": "high",
+            "question": "Can I afford to move from Trondheim to Oslo if it increases my housing from 12,000 to 20,000 NOK per month? I earn 55,000 NOK and currently save 15,000 per month.",
+            "expected_reasoning_steps": [
+                "Calculate current vs new budget",
+                "Assess impact on savings",
+                "Compare to Norwegian averages",
+                "Evaluate lifestyle affordability",
+                "Provide decision recommendation with alternatives"
+            ],
+            "why_nontrivial": "Requires scenario comparison, impact analysis, and decision support"
+        },
+        {
+            "id": 9,
+            "category": "major_purchases",
+            "complexity": "high",
+            "question": "I'm considering buying a 3.5 million NOK apartment in Bergen. I earn 70,000 NOK per month, have 500,000 saved, and spend 45,000 per month. Is this affordable? What down payment and loan terms should I aim for?",
+            "expected_reasoning_steps": [
+                "Calculate required down payment (15% for house)",
+                "Estimate monthly mortgage payment",
+                "Assess impact on budget",
+                "Evaluate financial health with purchase",
+                "Recommend approach or alternatives"
+            ],
+            "why_nontrivial": "Requires mortgage calculations, affordability assessment, and long-term financial planning"
+        },
+        {
+            "id": 10,
+            "category": "savings_strategy",
+            "complexity": "medium",
+            "question": "I want to save 500,000 NOK in 3 years for a down payment on a house. I earn 50,000 per month and currently save 8,000 per month. How can I reach my goal?",
+            "expected_reasoning_steps": [
+                "Calculate required monthly savings (500k / 36 months)",
+                "Identify gap from current savings",
+                "Analyze savings potential",
+                "Provide optimization recommendations",
+                "Create savings timeline"
+            ],
+            "why_nontrivial": "Requires goal-based planning, gap analysis, and actionable strategy"
+        },
+        {
+            "id": 11,
+            "category": "budget_optimization",
+            "complexity": "high",
+            "question": "I'm a student earning 25,000 NOK per month (part-time + student loan). I spend 10,000 on housing, 4,000 on food, 2,000 on transport, 3,000 on entertainment, and 2,000 on other expenses. How can I improve my financial situation?",
+            "expected_reasoning_steps": [
+                "Analyze budget health for low income",
+                "Identify optimization opportunities",
+                "Compare to Norwegian student norms",
+                "Provide student-specific recommendations",
+                "Suggest income increase strategies"
+            ],
+            "why_nontrivial": "Requires context-aware analysis for low-income scenario with limited optimization options"
+        },
+        {
+            "id": 12,
+            "category": "financial_health",
+            "complexity": "high",
+            "question": "Compare my spending to Norwegian averages and tell me if I'm overspending anywhere: Income 48,000 NOK, housing 14,000, food 9,000, transport 8,000, entertainment 6,000, other 3,000.",
+            "expected_reasoning_steps": [
+                "Get Norwegian averages for all categories",
+                "Calculate deviations for each category",
+                "Detect statistical anomalies",
+                "Identify overspending categories",
+                "Provide specific reduction recommendations"
+            ],
+            "why_nontrivial": "Requires comprehensive comparative analysis and statistical interpretation"
+        },
+        {
+            "id": 13,
+            "category": "lifestyle_affordability",
+            "complexity": "high",
+            "question": "I want to work part-time (30,000 NOK/month) to have better work-life balance. Currently I earn 50,000 and spend 38,000 per month. Is this lifestyle change financially viable?",
+            "expected_reasoning_steps": [
+                "Calculate new income vs current expenses",
+                "Identify required expense reductions",
+                "Assess lifestyle affordability",
+                "Provide optimization recommendations",
+                "Evaluate feasibility and alternatives"
+            ],
+            "why_nontrivial": "Requires income reduction scenario analysis and lifestyle trade-off evaluation"
+        },
+        {
+            "id": 14,
+            "category": "major_purchases",
+            "complexity": "medium",
+            "question": "Should I buy a 150,000 NOK used car or lease a new car for 4,000 NOK per month? I earn 45,000 NOK, have 80,000 saved, and spend 32,000 per month.",
+            "expected_reasoning_steps": [
+                "Evaluate cash purchase option",
+                "Calculate lease total cost",
+                "Assess impact on budget for both options",
+                "Compare long-term costs",
+                "Recommend best option"
+            ],
+            "why_nontrivial": "Requires multi-option comparison and total cost of ownership analysis"
+        },
+        {
+            "id": 15,
+            "category": "savings_strategy",
+            "complexity": "high",
+            "question": "I'm 30 years old and want to retire at 60 with 10 million NOK saved. I currently earn 60,000 per month and save 12,000. Am I on track? What should I do?",
+            "expected_reasoning_steps": [
+                "Calculate required savings over 30 years",
+                "Account for investment returns (simplified)",
+                "Compare current vs required savings rate",
+                "Assess if on track",
+                "Provide adjustment recommendations"
+            ],
+            "why_nontrivial": "Requires long-term financial planning and retirement goal assessment"
+        },
+        {
+            "id": 16,
+            "category": "budget_optimization",
+            "complexity": "high",
+            "question": "I just got a 10,000 NOK raise (now earning 55,000 per month). How should I allocate this extra money between savings, lifestyle improvements, and debt repayment? I currently save 8,000 per month.",
+            "expected_reasoning_steps": [
+                "Analyze current financial health",
+                "Evaluate savings rate",
+                "Consider debt situation",
+                "Recommend allocation strategy",
+                "Provide specific percentages"
+            ],
+            "why_nontrivial": "Requires multi-objective optimization and financial priority assessment"
+        },
+        {
+            "id": 17,
+            "category": "financial_health",
+            "complexity": "medium",
+            "question": "I'm spending 3,000 NOK per month on entertainment (income 40,000 NOK). Is this too much? What's reasonable?",
+            "expected_reasoning_steps": [
+                "Get Norwegian average for entertainment",
+                "Calculate percentage of income",
+                "Detect if anomalous",
+                "Provide context-based recommendation",
+                "Suggest reasonable range"
+            ],
+            "why_nontrivial": "Requires contextual analysis and norm-based recommendations"
+        },
+        {
+            "id": 18,
+            "category": "lifestyle_affordability",
+            "complexity": "high",
+            "question": "I'm considering having a child. My partner and I earn 90,000 NOK combined and spend 60,000 per month. Can we afford childcare costs of 5,000 NOK per month while maintaining our current lifestyle?",
+            "expected_reasoning_steps": [
+                "Calculate new total expenses",
+                "Assess impact on savings",
+                "Evaluate financial health with new expense",
+                "Identify optimization opportunities",
+                "Provide feasibility assessment"
+            ],
+            "why_nontrivial": "Requires life event planning and family budget analysis"
+        },
+        {
+            "id": 19,
+            "category": "major_purchases",
+            "complexity": "high",
+            "question": "I want to pursue a master's degree costing 200,000 NOK total. I earn 45,000 per month and have 50,000 saved. Should I take a student loan, save up, or work part-time during studies?",
+            "expected_reasoning_steps": [
+                "Evaluate each option financially",
+                "Calculate time to save",
+                "Assess loan costs",
+                "Consider opportunity cost",
+                "Recommend best approach"
+            ],
+            "why_nontrivial": "Requires education investment analysis and multi-option comparison"
+        },
+        {
+            "id": 20,
+            "category": "savings_strategy",
+            "complexity": "high",
+            "question": "I have 100,000 NOK in emergency savings. Is this enough? I earn 50,000 per month and spend 38,000. Should I save more or invest the excess?",
+            "expected_reasoning_steps": [
+                "Calculate recommended emergency fund (3-6 months expenses)",
+                "Compare to current savings",
+                "Assess if adequate",
+                "Provide recommendation on excess",
+                "Suggest next financial steps"
+            ],
+            "why_nontrivial": "Requires emergency fund assessment and financial planning guidance"
+        }
+    ]
+}
