@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,9 +28,45 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             margin-bottom: 30px;
             text-align: center;
+            position: relative;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 5px;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            color: #667eea;
+            transform: none;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
         }
 
         h1 {
@@ -55,7 +92,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .input-group {
@@ -124,7 +161,7 @@
             background: white;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .baseline-panel {
@@ -222,8 +259,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .stats-panel {
@@ -231,7 +273,7 @@
             background: white;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
@@ -275,50 +317,65 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
+            <div class="language-switcher">
+                <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+                <button class="lang-btn" onclick="switchLanguage('no')" id="lang-no">NO</button>
+            </div>
             <h1>🚀 Norfain ReAct Agent</h1>
-            <p class="subtitle">Interactive Demo: Baseline vs ReAct Reasoning</p>
+            <p class="subtitle" data-translate="subtitle">Interactive Demo: Baseline vs ReAct Reasoning</p>
         </header>
 
         <div class="question-panel">
-            <h2 style="margin-bottom: 15px;">💬 Ask a Question</h2>
+            <h2 style="margin-bottom: 15px;" data-translate="askQuestion">💬 Ask a Question</h2>
             <div class="input-group">
-                <input type="text" id="questionInput" 
-                       placeholder="e.g., How much do Norwegian families spend on housing?"
-                       onkeypress="if(event.key==='Enter') askQuestion()">
-                <button onclick="askQuestion()" id="askBtn">Ask Both Agents</button>
+                <input type="text" id="questionInput" data-translate-placeholder="inputPlaceholder"
+                    placeholder="e.g., How much do Norwegian families spend on housing?"
+                    onkeypress="if(event.key==='Enter') askQuestion()">
+                <button onclick="askQuestion()" id="askBtn" data-translate="askBothAgents">Ask Both Agents</button>
             </div>
             <div class="example-questions">
-                <strong>Examples:</strong>
-                <button class="example-btn" onclick="useExample(this)">How much do Norwegian families spend on housing?</button>
-                <button class="example-btn" onclick="useExample(this)">Do Norwegians spend more on housing or food?</button>
-                <button class="example-btn" onclick="useExample(this)">What's the ratio of housing to food costs?</button>
-                <button class="example-btn" onclick="useExample(this)">What's a realistic monthly budget in Norway?</button>
+                <strong data-translate="examples">Examples:</strong>
+                <button class="example-btn" onclick="useExample(this)" data-translate="example1">How much do Norwegian
+                    families spend on
+                    housing?</button>
+                <button class="example-btn" onclick="useExample(this)" data-translate="example2">Do Norwegians spend
+                    more on housing or
+                    food?</button>
+                <button class="example-btn" onclick="useExample(this)" data-translate="example3">What's the ratio of
+                    housing to food
+                    costs?</button>
+                <button class="example-btn" onclick="useExample(this)" data-translate="example4">What's a realistic
+                    monthly budget in
+                    Norway?</button>
             </div>
         </div>
 
         <div class="main-content">
             <div class="agent-panel baseline-panel">
                 <div class="agent-header">
-                    <span class="agent-title baseline-title">🤖 Baseline Agent</span>
+                    <span class="agent-title baseline-title" data-translate="baselineAgent">🤖 Baseline Agent</span>
                     <span class="time-badge baseline-badge" id="baselineTime">--</span>
                 </div>
-                <div><strong>Type:</strong> Direct prompting, single-step</div>
+                <div><strong data-translate="type">Type:</strong> <span data-translate="baselineType">Direct prompting,
+                        single-step</span></div>
                 <div class="response-area" id="baselineResponse">
-                    <em style="color: #999;">Waiting for question...</em>
+                    <em style="color: #999;" data-translate="waitingForQuestion">Waiting for question...</em>
                 </div>
             </div>
 
             <div class="agent-panel react-panel">
                 <div class="agent-header">
-                    <span class="agent-title react-title">🧠 ReAct Agent</span>
+                    <span class="agent-title react-title" data-translate="reactAgent">🧠 ReAct Agent</span>
                     <span class="time-badge react-badge" id="reactTime">--</span>
                 </div>
-                <div><strong>Type:</strong> Multi-step reasoning with traces</div>
+                <div><strong data-translate="type">Type:</strong> <span data-translate="reactType">Multi-step reasoning
+                        with traces</span></div>
                 <div class="response-area" id="reactResponse">
-                    <em style="color: #999;">Waiting for question...</em>
+                    <em style="color: #999;" data-translate="waitingForQuestion">Waiting for question...</em>
                 </div>
                 <div id="reasoningTrace"></div>
             </div>
@@ -326,33 +383,134 @@
 
         <div class="stats-panel" id="statsPanel" style="display: none;">
             <div class="stat-card">
-                <div class="stat-label">Time Difference</div>
+                <div class="stat-label" data-translate="timeDifference">Time Difference</div>
                 <div class="stat-value" id="timeDiff">--</div>
                 <div class="comparison-badge" id="timeComparison">--</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">ReAct Iterations</div>
+                <div class="stat-label" data-translate="reactIterations">ReAct Iterations</div>
                 <div class="stat-value" id="iterations">--</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Baseline Tool Usage</div>
+                <div class="stat-label" data-translate="baselineToolUsage">Baseline Tool Usage</div>
                 <div class="stat-value" id="baselineTool">--</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">ReAct Tool Usage</div>
+                <div class="stat-label" data-translate="reactToolUsage">ReAct Tool Usage</div>
                 <div class="stat-value" id="reactTool">100%</div>
             </div>
         </div>
     </div>
 
     <script>
+        // Translation dictionary
+        const translations = {
+            en: {
+                subtitle: "Interactive Demo: Baseline vs ReAct Reasoning",
+                askQuestion: "💬 Ask a Question",
+                inputPlaceholder: "e.g., How much do Norwegian families spend on housing?",
+                askBothAgents: "Ask Both Agents",
+                examples: "Examples:",
+                example1: "How much do Norwegian families spend on housing?",
+                example2: "Do Norwegians spend more on housing or food?",
+                example3: "What's the ratio of housing to food costs?",
+                example4: "What's a realistic monthly budget in Norway?",
+                baselineAgent: "🤖 Baseline Agent",
+                reactAgent: "🧠 ReAct Agent",
+                type: "Type:",
+                baselineType: "Direct prompting, single-step",
+                reactType: "Multi-step reasoning with traces",
+                waitingForQuestion: "Waiting for question...",
+                timeDifference: "Time Difference",
+                reactIterations: "ReAct Iterations",
+                baselineToolUsage: "Baseline Tool Usage",
+                reactToolUsage: "ReAct Tool Usage",
+                processing: "Processing...",
+                processingQuestion: "Processing question...",
+                processingReasoning: "Processing question with reasoning...",
+                reasoningTrace: "🔍 Reasoning Trace:",
+                iteration: "Iteration",
+                thought: "THOUGHT:",
+                action: "ACTION:",
+                observation: "OBSERVATION:",
+                ofBaselineTime: "of baseline time"
+            },
+            no: {
+                subtitle: "Interaktiv Demo: Baseline vs ReAct Resonnering",
+                askQuestion: "💬 Still et Spørsmål",
+                inputPlaceholder: "f.eks., Hvor mye bruker norske familier på bolig?",
+                askBothAgents: "Spør Begge Agenter",
+                examples: "Eksempler:",
+                example1: "Hvor mye bruker norske familier på bolig?",
+                example2: "Bruker nordmenn mer på bolig eller mat?",
+                example3: "Hva er forholdet mellom bolig- og matkostnader?",
+                example4: "Hva er et realistisk månedlig budsjett i Norge?",
+                baselineAgent: "🤖 Baseline Agent",
+                reactAgent: "🧠 ReAct Agent",
+                type: "Type:",
+                baselineType: "Direkte prompting, enkelt-trinn",
+                reactType: "Flertrinnresonnering med spor",
+                waitingForQuestion: "Venter på spørsmål...",
+                timeDifference: "Tidsforskjell",
+                reactIterations: "ReAct Iterasjoner",
+                baselineToolUsage: "Baseline Verktøybruk",
+                reactToolUsage: "ReAct Verktøybruk",
+                processing: "Behandler...",
+                processingQuestion: "Behandler spørsmål...",
+                processingReasoning: "Behandler spørsmål med resonnering...",
+                reasoningTrace: "🔍 Resonnering Spor:",
+                iteration: "Iterasjon",
+                thought: "TANKE:",
+                action: "HANDLING:",
+                observation: "OBSERVASJON:",
+                ofBaselineTime: "av baseline tid"
+            }
+        };
+
+        // Current language (default: English)
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        // Switch language function
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+
+            // Update button states
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.getElementById('lang-no').classList.toggle('active', lang === 'no');
+
+            // Update all translatable elements
+            updateTranslations();
+        }
+
+        // Update all translations
+        function updateTranslations() {
+            const lang = translations[currentLanguage];
+
+            // Update text content
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (lang[key]) {
+                    element.textContent = lang[key];
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (lang[key]) {
+                    element.placeholder = lang[key];
+                }
+            });
+        }
+
         function useExample(button) {
             document.getElementById('questionInput').value = button.textContent;
         }
 
         async function askQuestion() {
             const question = document.getElementById('questionInput').value.trim();
-            
+
             if (!question) {
                 alert('Please enter a question');
                 return;
@@ -361,11 +519,11 @@
             // Disable button and show loading
             const btn = document.getElementById('askBtn');
             btn.disabled = true;
-            btn.textContent = 'Processing...';
+            btn.textContent = translations[currentLanguage].processing;
 
             // Show loading in response areas
-            document.getElementById('baselineResponse').innerHTML = '<div class="loading"><div class="spinner"></div>Processing question...</div>';
-            document.getElementById('reactResponse').innerHTML = '<div class="loading"><div class="spinner"></div>Processing question with reasoning...</div>';
+            document.getElementById('baselineResponse').innerHTML = `<div class="loading"><div class="spinner"></div>${translations[currentLanguage].processingQuestion}</div>`;
+            document.getElementById('reactResponse').innerHTML = `<div class="loading"><div class="spinner"></div>${translations[currentLanguage].processingReasoning}</div>`;
             document.getElementById('reasoningTrace').innerHTML = '';
             document.getElementById('statsPanel').style.display = 'none';
 
@@ -394,21 +552,21 @@
 
                 // Display reasoning trace
                 if (data.react.reasoning_steps && data.react.reasoning_steps.length > 0) {
-                    let traceHTML = '<div class="reasoning-trace"><h3>🔍 Reasoning Trace:</h3>';
-                    
+                    let traceHTML = `<div class="reasoning-trace"><h3>${translations[currentLanguage].reasoningTrace}</h3>`;
+
                     data.react.reasoning_steps.forEach((step, idx) => {
                         if (step.action) {
                             traceHTML += `
                                 <div class="reasoning-step">
-                                    <div><span class="step-label">Iteration ${step.iteration}:</span></div>
-                                    <div><span class="step-label">THOUGHT:</span> ${step.thought.substring(0, 150)}...</div>
-                                    <div><span class="step-label">ACTION:</span> ${step.action}</div>
-                                    <div><span class="step-label">OBSERVATION:</span> ${step.observation.substring(0, 100)}...</div>
+                                    <div><span class="step-label">${translations[currentLanguage].iteration} ${step.iteration}:</span></div>
+                                    <div><span class="step-label">${translations[currentLanguage].thought}</span> ${step.thought.substring(0, 150)}...</div>
+                                    <div><span class="step-label">${translations[currentLanguage].action}</span> ${step.action}</div>
+                                    <div><span class="step-label">${translations[currentLanguage].observation}</span> ${step.observation.substring(0, 100)}...</div>
                                 </div>
                             `;
                         }
                     });
-                    
+
                     traceHTML += '</div>';
                     document.getElementById('reasoningTrace').innerHTML = traceHTML;
                 }
@@ -416,7 +574,7 @@
                 // Show statistics
                 document.getElementById('statsPanel').style.display = 'grid';
                 document.getElementById('timeDiff').textContent = `+${data.comparison.time_difference.toFixed(2)}s`;
-                document.getElementById('timeComparison').textContent = `${(data.comparison.time_ratio * 100).toFixed(0)}% of baseline time`;
+                document.getElementById('timeComparison').textContent = `${(data.comparison.time_ratio * 100).toFixed(0)}% ${translations[currentLanguage].ofBaselineTime}`;
                 document.getElementById('iterations').textContent = data.react.iterations || 'N/A';
                 document.getElementById('baselineTool').textContent = data.baseline.tool_used ? '✓ Yes' : '✗ No';
 
@@ -426,12 +584,15 @@
                 document.getElementById('reactResponse').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Ask Both Agents';
+                btn.textContent = translations[currentLanguage].askBothAgents;
             }
         }
 
         // Check server health on load
         window.addEventListener('load', async () => {
+            // Initialize language on page load
+            switchLanguage(currentLanguage);
+
             try {
                 const response = await fetch('/health');
                 const data = await response.json();
@@ -442,4 +603,5 @@
         });
     </script>
 </body>
+
 </html>
