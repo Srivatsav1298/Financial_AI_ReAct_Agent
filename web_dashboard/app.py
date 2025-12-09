@@ -9,9 +9,18 @@ import sys
 from pathlib import Path
 import json
 import time
+import importlib
 
-# Add src to path
-sys.path.append(str(Path(__file__).parent.parent / "src"))
+# Add src to path (from root directory: Norfain/src)
+sys.path.append(str(Path(__file__).parent.parent.parent / "src"))
+
+# Import agent modules
+from agents import baseline
+from agents import react_agent
+
+# Force reload to get latest code (important for development)
+importlib.reload(baseline)
+importlib.reload(react_agent)
 
 from agents.baseline import BaselineAgent
 from agents.react_agent import SimpleReactAgent
@@ -22,10 +31,17 @@ CORS(app)
 
 # Initialize agents
 print("🚀 Initializing agents...")
-baseline_agent = BaselineAgent()
-react_agent = SimpleReactAgent()
-ssb_api = SSBApi()
-print("✅ Agents ready!")
+try:
+    baseline_agent = BaselineAgent()
+    react_agent = SimpleReactAgent()
+    ssb_api = SSBApi()
+    print("✅ Agents ready!")
+except Exception as e:
+    print(f"❌ Failed to initialize agents: {e}")
+    # Initialize with None or handle gracefully if needed, 
+    # but for now let it print error. 
+    # The agents themselves calculate fallback, but instantiation must succeed.
+    raise e
 
 
 @app.route('/')
@@ -42,6 +58,7 @@ def ask_question():
     """
     data = request.json
     question = data.get('question', '')
+    language = data.get('language', 'en')  # Get language preference (en or no)
     
     if not question:
         return jsonify({'error': 'No question provided'}), 400
@@ -49,16 +66,17 @@ def ask_question():
     try:
         # Get baseline response
         print(f"\n📝 Question: {question}")
+        print(f"🌍 Language: {language}")
         print("🤖 Running Baseline...")
         
         baseline_start = time.time()
-        baseline_result = baseline_agent.answer_question(question)
+        baseline_result = baseline_agent.answer_question(question, language=language)
         baseline_time = time.time() - baseline_start
         
         # Get ReAct response
         print("🧠 Running ReAct...")
         react_start = time.time()
-        react_result = react_agent.answer_question(question)
+        react_result = react_agent.answer_question(question, language=language)
         react_time = time.time() - react_start
         
         print("✅ Both agents complete!")
@@ -92,7 +110,11 @@ def ask_question():
         print(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        # Return a structured error response that the frontend can parse
+        return jsonify({
+            'error': str(e),
+            'type': 'Internal Server Error'
+        }), 500
 
 
 @app.route('/api/ssb-data', methods=['GET'])
@@ -137,8 +159,8 @@ def get_ssb_data():
 def get_stats():
     """Get system statistics"""
     try:
-        # Try to load latest results
-        results_dir = Path(__file__).parent.parent / "results"
+        # Try to load latest results from root results directory
+        results_dir = Path(__file__).parent.parent.parent / "results"
         
         baseline_files = sorted(results_dir.glob("baseline_results_*.json"))
         react_files = sorted(results_dir.glob("react_results_*.json"))

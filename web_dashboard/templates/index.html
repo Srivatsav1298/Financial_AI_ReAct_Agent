@@ -339,18 +339,29 @@
             </div>
             <div class="example-questions">
                 <strong data-translate="examples">Examples:</strong>
+                <br><br>
+                <div style="margin-bottom: 10px;"><strong>📊 Simple Questions:</strong></div>
                 <button class="example-btn" onclick="useExample(this)" data-translate="example1">How much do Norwegian
                     families spend on
                     housing?</button>
                 <button class="example-btn" onclick="useExample(this)" data-translate="example2">Do Norwegians spend
                     more on housing or
                     food?</button>
-                <button class="example-btn" onclick="useExample(this)" data-translate="example3">What's the ratio of
-                    housing to food
-                    costs?</button>
-                <button class="example-btn" onclick="useExample(this)" data-translate="example4">What's a realistic
-                    monthly budget in
-                    Norway?</button>
+
+                <br><br>
+                <div style="margin-bottom: 10px;"><strong>🧠 Complex Scenarios (ReAct Excels Here):</strong></div>
+                <button class="example-btn" onclick="useExample(this)">I earn 45,000 NOK/month and spend 15,000 on
+                    housing, 8,000 on food, 6,000 on transport, 3,000 on entertainment. I want to save 10,000/month.
+                    What should I change?</button>
+                <button class="example-btn" onclick="useExample(this)">I earn 55,000 NOK/month with expenses: housing
+                    18,000, food 7,000, transport 5,000, entertainment 3,000, other 4,000. Am I financially
+                    healthy?</button>
+                <button class="example-btn" onclick="useExample(this)">I want to buy a 300,000 NOK car. I earn
+                    50,000/month, have 100,000 saved, expenses are 35,000/month. Should I buy now or save
+                    longer?</button>
+                <button class="example-btn" onclick="useExample(this)">I earn 60,000 NOK/month and spend 16,000 on
+                    housing, 9,000 on food, 7,000 on transport, 5,000 on entertainment. How much could I realistically
+                    save if I optimize my budget?</button>
             </div>
         </div>
 
@@ -533,7 +544,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ question: question })
+                    body: JSON.stringify({
+                        question: question,
+                        language: currentLanguage  // Send current language to backend
+                    })
                 });
 
                 if (!response.ok) {
@@ -580,8 +594,22 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('baselineResponse').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-                document.getElementById('reactResponse').innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                
+                // Friendly error message map
+                let displayError = error.message;
+                if (error.message === 'Failed to get response') {
+                    displayError = 'Server failed to respond. Please check if the backend is running.';
+                }
+                
+                const errorHtml = `
+                    <div class="error-message">
+                        <strong>⚠️ Error:</strong> ${displayError}
+                        <br><br>
+                        <small>Check the server logs for more details.</small>
+                    </div>`;
+                    
+                document.getElementById('baselineResponse').innerHTML = errorHtml;
+                document.getElementById('reactResponse').innerHTML = errorHtml;
             } finally {
                 btn.disabled = false;
                 btn.textContent = translations[currentLanguage].askBothAgents;
