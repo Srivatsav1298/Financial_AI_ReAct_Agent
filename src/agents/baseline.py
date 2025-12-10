@@ -156,7 +156,7 @@ Please answer the question using this data and cite SSB as the source."""
             try:
                 tool_result = get_average_spending_by_category.invoke({"category": found_category})
             except:
-                tool_result = "Data lookup failed."
+                tool_result = "Data oppslag feilet." if language == 'no' else "Data lookup failed."
 
         # Canned responses
         if language == 'no':

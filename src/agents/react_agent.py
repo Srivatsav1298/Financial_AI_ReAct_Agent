@@ -301,27 +301,40 @@ Use advanced tools for non-trivial questions. Be thorough and analytical."""
         """Mock ReAct response for demo purposes"""
         print("⚠️ USING FALLBACK RESPONSE")
         
-        reasoning_steps = [
-            {
-                "iteration": 1,
-                "thought": "I need to check if the AI model is running.",
-                "action": "check_connection(Ollama)",
-                "observation": "Connection Failed"
-            },
-            {
-                "iteration": 2,
-                "thought": "Since the local AI is down, I should inform the user directly.",
-                "action": "respond_fallback()",
-                "observation": "Preparing fallback message"
-            }
-        ]
-        
         if language == 'no':
+            reasoning_steps = [
+                {
+                    "iteration": 1,
+                    "thought": "Jeg må sjekke om AI-modellen kjører.",
+                    "action": "sjekk_tilkobling(Ollama)",
+                    "observation": "Tilkobling mislyktes"
+                },
+                {
+                    "iteration": 2,
+                    "thought": "Siden den lokale AI-en er nede, bør jeg informere brukeren direkte.",
+                    "action": "svar_fallback()",
+                    "observation": "Forbereder feilmelding"
+                }
+            ]
             msg = "Jeg kan ikke koble til den lokale AI-modellen (Ollama), så jeg kan ikke utføre avansert resonnering akkurat nå."
             if error:
                 msg += f"\n\nTeknisk feil: {error}"
             msg += "\n\nVennligst start Ollama lokalt for å se ReAct i aksjon."
         else:
+            reasoning_steps = [
+                {
+                    "iteration": 1,
+                    "thought": "I need to check if the AI model is running.",
+                    "action": "check_connection(Ollama)",
+                    "observation": "Connection Failed"
+                },
+                {
+                    "iteration": 2,
+                    "thought": "Since the local AI is down, I should inform the user directly.",
+                    "action": "respond_fallback()",
+                    "observation": "Preparing fallback message"
+                }
+            ]
             msg = "I cannot connect to the local AI model (Ollama), so I cannot perform advanced reasoning right now."
             if error:
                 msg += f"\n\nTechnical Error: {error}"
