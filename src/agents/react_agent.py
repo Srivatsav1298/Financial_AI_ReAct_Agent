@@ -25,8 +25,11 @@ from tools.advanced_tools import (
     assess_lifestyle_affordability,
     detect_spending_anomalies,
     calculate_savings_potential,
-    evaluate_major_purchase
+    evaluate_major_purchase,
+    simulate_future_wealth,
+    generate_financial_persona_comment
 )
+
 
 
 class SimpleReactAgent:
@@ -46,7 +49,9 @@ class SimpleReactAgent:
             "assess_lifestyle": assess_lifestyle_affordability,
             "detect_anomalies": detect_spending_anomalies,
             "calculate_savings": calculate_savings_potential,
-            "evaluate_purchase": evaluate_major_purchase
+            "evaluate_purchase": evaluate_major_purchase,
+            "simulate_wealth": simulate_future_wealth,
+            "generate_persona": generate_financial_persona_comment
         }
         self.max_iterations = 10  # Increased for complex reasoning
 
@@ -67,8 +72,19 @@ class SimpleReactAgent:
         if action_match:
             tool_name = action_match.group(1).lower()
             args_str = action_match.group(2).strip('\'"')
-            args = [arg.strip().strip('\'"') for arg in args_str.split(',')]
-            return tool_name, args
+            # Split by comma, respecting quotes would be better but simple split works for numbers
+            raw_args = [arg.strip().strip('\'"') for arg in args_str.split(',')]
+            
+            # Clean args: remove "key=" if the LLM hallucinated kwargs
+            clean_args = []
+            for arg in raw_args:
+                if '=' in arg:
+                    # 'income=50000' -> '50000'
+                    clean_args.append(arg.split('=')[1].strip())
+                else:
+                    clean_args.append(arg)
+            
+            return tool_name, clean_args
         return None, None
 
     def _call_tool(self, tool_name: str, args: List[str]) -> str:
@@ -89,7 +105,11 @@ class SimpleReactAgent:
             "calculate_savings": "calculate_savings",
             "calculate_savings_potential": "calculate_savings",
             "evaluate_purchase": "evaluate_purchase",
-            "evaluate_major_purchase": "evaluate_purchase"
+            "evaluate_major_purchase": "evaluate_purchase",
+            "simulate_wealth": "simulate_wealth",
+            "simulate_future_wealth": "simulate_wealth",
+            "generate_persona": "generate_persona",
+            "generate_financial_persona_comment": "generate_persona"
         }
         mapped_tool = tool_mapping.get(tool_name)
         if not mapped_tool or mapped_tool not in self.tools:
@@ -161,6 +181,17 @@ class SimpleReactAgent:
                     "monthly_expenses": float(args[3]),
                     "purchase_type": args[4] if len(args) > 4 else "general"
                 })
+            elif mapped_tool == "simulate_wealth":
+                result = tool.invoke({
+                    "monthly_savings": float(args[0]),
+                    "current_savings": float(args[1]),
+                    "years": int(args[2]) if len(args) > 2 else 30
+                })
+            elif mapped_tool == "generate_persona":
+                result = tool.invoke({
+                    "persona": args[0],
+                    "context_data": args[1]
+                })
             else:
                 result = tool.invoke({})
             
@@ -170,7 +201,7 @@ class SimpleReactAgent:
             traceback.print_exc()
             return f"Error calling tool: {str(e)}"
 
-    def answer_question(self, question: str, language: str = 'en') -> Dict[str, Any]:
+    def answer_question(self, question: str, language: str = 'en', persona: str = 'analyst') -> Dict[str, Any]:
         print(f"\n{'='*80}")
         print(f"🤔 REACT AGENT REASONING...")
         print(f"{'='*80}\n")
@@ -181,6 +212,7 @@ class SimpleReactAgent:
 
         conversation_history = []
         reasoning_steps = []
+        structured_tool_outputs = []
         
         # Language-specific instructions
         if language == 'no':
@@ -212,7 +244,10 @@ ADVANCED ANALYSIS TOOLS (use these for complex questions):
 - detect_anomalies(housing, food, transport, entertainment, income) - detect unusual spending patterns
 - calculate_savings(income, housing, food, transport, entertainment, other) - find savings opportunities
 - evaluate_purchase(price, income, current_savings, monthly_expenses, type) - evaluate major purchase affordability
+- simulate_wealth(monthly_savings, current_savings, years) - simulate future wealth with compound interest (returns chart data)
+- generate_persona(persona, context) - get a persona-driven comment (roast, coach, etc)
 
+For COMPLEX questions requiring personalized recommendations:
 For COMPLEX questions requiring personalized recommendations:
 1. Use MULTIPLE tools to gather comprehensive data
 2. Analyze from multiple angles (health, optimization, anomalies)
@@ -222,7 +257,17 @@ For COMPLEX questions requiring personalized recommendations:
 After thorough analysis, provide:
 {final_answer_label}: [comprehensive answer with specific recommendations and sources]
 
-Use advanced tools for non-trivial questions. Be thorough and analytical."""
+Use advanced tools for non-trivial questions. Be thorough and analytical.
+
+CURRENT PERSONA: {persona.upper()}
+
+IMPORTANT: You MUST adopt this persona in your THOUGHTS and FINAL ANSWER.
+- If 'ROAST': Be sarcastic, funny, and brutally honest. Mock bad financial habits. Use emojis like 💀💸.
+- If 'COACH': Be essentially supportive, encouraging, and motivational. Use emojis like 🚀💪.
+- If 'STRICT': Be extremely professional, concise, and efficiency-obsessed. No fluff. Use emojis like 📉🧐.
+- If 'DEBATE': (Covered by multi-agent mode, ignore here).
+
+Internalize this persona NOW. Do not break character."""
 
         current_question = f"Question: {question}"
 
@@ -261,6 +306,7 @@ Use advanced tools for non-trivial questions. Be thorough and analytical."""
                             "reasoning_steps": reasoning_steps,
                             "conversation_history": conversation_history,
                             "iterations": iteration + 1,
+                            "structured_tools": structured_tool_outputs,
                             "model": "react_simple (Ollama Llama3.2)"
                         }
 
@@ -268,13 +314,22 @@ Use advanced tools for non-trivial questions. Be thorough and analytical."""
                 if tool_name and args:
                     print(f"🔧 Executing: {tool_name}({args})\n")
                     observation = self._call_tool(tool_name, args)
-                    print(f"📊 OBSERVATION:\n{observation}\n")
-                    conversation_history.append(f"OBSERVATION: {observation}")
+                    
+                    # Handle structured output (Dict) vs String
+                    if isinstance(observation, dict) and "text" in observation:
+                        text_observation = observation["text"]
+                        if "data" in observation:
+                            structured_tool_outputs.append(observation["data"])
+                    else:
+                        text_observation = str(observation)
+                        
+                    print(f"📊 OBSERVATION:\n{text_observation}\n")
+                    conversation_history.append(f"OBSERVATION: {text_observation}")
                     reasoning_steps.append({
                         "iteration": iteration + 1,
                         "thought": llm_output,
                         "action": f"{tool_name}({args})",
-                        "observation": observation
+                        "observation": text_observation
                     })
                 else:
                     reasoning_steps.append({
@@ -291,6 +346,7 @@ Use advanced tools for non-trivial questions. Be thorough and analytical."""
                 "reasoning_steps": reasoning_steps,
                 "conversation_history": conversation_history,
                 "iterations": self.max_iterations,
+                "structured_tools": structured_tool_outputs,
                 "model": "react_simple (Ollama Llama3.2)"
             }
         except Exception as e:
@@ -348,6 +404,72 @@ Use advanced tools for non-trivial questions. Be thorough and analytical."""
             "iterations": 2,
             "model": "Fallback (No LLM)"
         }
+
+
+    def reason_with_debate(self, question: str, language: str = 'en') -> Dict[str, Any]:
+        """
+        Research-Grade Feature: Multi-Agent Debate.
+        Orchestrates a dialectic between specialized sub-agents.
+        """
+        print(f"\n{'='*80}")
+        print(f"🗣️ MULTI-AGENT DEBATE PROTOCOL INITIATED")
+        print(f"{'='*80}\n")
+        
+        if not self.llm:
+            return self._fallback_response(question, language, error="No LLM for debate")
+            
+        transcript = []
+        
+        # 1. THE GROWTH AGENT (Thesis)
+        print("🟢 GROWTH AGENT (Thesis)...")
+        growth_prompt = f"""You are the GROWTH AGENT. Your goal is to maximize wealth, suggesting aggressive but viable financial strategies.
+        Ignore safety concerns for a moment and focus on UPSIDE. Use the available data to build a strong case for growth.
+        
+        Question: {question}
+        
+        Provide your formatted argument."""
+        
+        growth_resp = self.llm.invoke(growth_prompt).content
+        transcript.append({"agent": "Growth Agent", "color": "#2ecc71", "content": growth_resp})
+        print(f"{growth_resp}\n")
+        
+        # 2. THE RISK AGENT (Antithesis)
+        print("🔴 RISK AGENT (Antithesis)...")
+        risk_prompt = f"""You are the RISK AGENT. Your job is to criticize the Growth Agent's plan.
+        Highlight dangers, volatility, downsides, and what could go wrong. Be the "Devils Advocate".
+        
+        Question: {question}
+        Growth Agent Proposal: {growth_resp}
+        
+        Provide your critique."""
+        
+        risk_resp = self.llm.invoke(risk_prompt).content
+        transcript.append({"agent": "Risk Agent", "color": "#e74c3c", "content": risk_resp})
+        print(f"{risk_resp}\n")
+        
+        # 3. THE SYNTHESIZER (Synthesis)
+        print("🔵 MODERATOR (Synthesis)...")
+        synth_prompt = f"""You are the CHIEF MODERATOR.
+        Review the debate between Growth and Risk agents.
+        
+        Question: {question}
+        Growth Argument: {growth_resp}
+        Risk Critique: {risk_resp}
+        
+        Synthesize a FINAL, BALANCED strategy that captures the best of both worlds.
+        FINAL ANSWER:"""
+        
+        synth_resp = self.llm.invoke(synth_prompt).content
+        transcript.append({"agent": "Synthesizer", "color": "#3498db", "content": synth_resp})
+        print(f"{synth_resp}\n")
+        
+        return {
+            "question": question,
+            "answer": synth_resp,
+            "debate_transcript": transcript,
+            "model": "Multi-Agent Debate (Llama3.2)"
+        }
+
 
 
 def test_simple_react():
