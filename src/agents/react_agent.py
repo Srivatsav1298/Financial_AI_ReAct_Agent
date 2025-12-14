@@ -1,6 +1,7 @@
 """
 Simple Manual ReAct Agent - Shows explicit reasoning (Ollama)
 Implements ReAct loop manually without complex LangChain abstractions
+FIXED VERSION: Addresses iteration stopping, tool output display, and data grounding
 """
 
 import os
@@ -31,9 +32,8 @@ from tools.advanced_tools import (
 )
 
 
-
 class SimpleReactAgent:
-    """Manual ReAct agent implementation"""
+    """Manual ReAct agent implementation with fixes for data grounding"""
     
     def __init__(self, model_name: str = "llama3.2"):
         self.model_name = model_name
@@ -53,7 +53,8 @@ class SimpleReactAgent:
             "simulate_wealth": simulate_future_wealth,
             "generate_persona": generate_financial_persona_comment
         }
-        self.max_iterations = 10  # Increased for complex reasoning
+        self.max_iterations = 15  # INCREASED for complex reasoning
+        self.minimum_iterations_complex = 4  # Don't stop before this on hard questions
 
     def _initialize_llm(self):
         """Try to initialize LLM, setup fallback if it fails"""
@@ -68,6 +69,7 @@ class SimpleReactAgent:
             self.llm = None
 
     def _parse_action(self, text: str) -> tuple:
+        """Extract tool name and arguments from LLM output"""
         action_match = re.search(r'ACTION:\s*(\w+)\((.*?)\)', text, re.IGNORECASE)
         if action_match:
             tool_name = action_match.group(1).lower()
@@ -87,7 +89,75 @@ class SimpleReactAgent:
             return tool_name, clean_args
         return None, None
 
+    def _extract_key_metrics(self, observation_result) -> str:
+        """
+        FIX #1: Extract and display actual numbers from tool outputs
+        Don't just return JSON - show the KEY METRICS prominently
+        """
+        if isinstance(observation_result, dict):
+            # If tool returns structured data, extract key values
+            if "text" in observation_result:
+                text = observation_result["text"]
+            else:
+                text = str(observation_result)
+            
+            # Also extract numeric data if present
+            if "data" in observation_result:
+                data = observation_result["data"]
+                
+                # Build a metrics summary
+                metrics_str = "\n📊 KEY METRICS RETRIEVED:\n"
+                
+                if isinstance(data, dict):
+                    for key, value in data.items():
+                        if isinstance(value, (int, float)):
+                            metrics_str += f"  • {key}: {value:,.0f}\n"
+                        else:
+                            metrics_str += f"  • {key}: {value}\n"
+                
+                metrics_str += f"\n📌 SOURCE: Statistics Norway (SSB Table 10235, 2012)\n"
+                metrics_str += f"\n{text}"
+                return metrics_str
+            
+            return text
+        
+        return str(observation_result)
+
+    def _validate_response(self, response: str, iteration: int, is_complex: bool) -> bool:
+        """
+        FIX #2: Don't accept generic advice early
+        Response must have actual numbers + SSB citations
+        """
+        # Count specific numbers (2+ digits)
+        numbers = re.findall(r'\d{2,}', response)
+        
+        # Check for SSB citations with values
+        ssb_pattern = r'SSB|Statistics Norway|Statistisk sentralbyrå'
+        has_ssb_citation = bool(re.search(ssb_pattern, response, re.IGNORECASE))
+        
+        # Check for generic phrases (bad indicators)
+        generic_phrases = [
+            'typically', 'generally', 'usually', 'usually recommend',
+            'financial guidelines', 'conventional wisdom', 'standard practice'
+        ]
+        has_generic = any(phrase in response.lower() for phrase in generic_phrases)
+        
+        # For complex questions, require minimum iterations + actual data
+        if is_complex:
+            if iteration < self.minimum_iterations_complex:
+                return False  # Keep iterating on complex questions
+            
+            if len(numbers) < 3 or not has_ssb_citation:
+                return False  # Need actual data before outputting
+        
+        # If response is mostly generic without data, reject it
+        if has_generic and len(numbers) < 2:
+            return False
+        
+        return True
+
     def _call_tool(self, tool_name: str, args: List[str]) -> str:
+        """Execute tool and return formatted observation with key metrics"""
         tool_mapping = {
             "get_spending": "get_spending",
             "get_average_spending_by_category": "get_spending",
@@ -195,11 +265,29 @@ class SimpleReactAgent:
             else:
                 result = tool.invoke({})
             
-            return result
+            # FIX #1: Extract key metrics from the result
+            return self._extract_key_metrics(result)
+            
         except Exception as e:
             import traceback
             traceback.print_exc()
             return f"Error calling tool: {str(e)}"
+
+    def _detect_question_complexity(self, question: str) -> bool:
+        """
+        Detect if a question is complex (requires multiple iterations).
+        Complex questions: recommendations, optimizations, multi-step analysis
+        """
+        complex_keywords = [
+            'should', 'recommend', 'optimize', 'budget', 'save', 'afford',
+            'buy', 'realistic', 'plan', 'strategy', 'allocate', 'spend',
+            'balance', 'trade-off', 'decision', 'compare', 'better',
+            'improve', 'risk', 'future', 'goal'
+        ]
+        
+        question_lower = question.lower()
+        is_complex = any(keyword in question_lower for keyword in complex_keywords)
+        return is_complex
 
     def answer_question(self, question: str, language: str = 'en', persona: str = 'analyst') -> Dict[str, Any]:
         print(f"\n{'='*80}")
@@ -210,75 +298,78 @@ class SimpleReactAgent:
         if not self.llm:
             return self._fallback_response(question, language)
 
+        # Detect complexity
+        is_complex = self._detect_question_complexity(question)
+        print(f"📋 Question Complexity: {'COMPLEX ⚠️' if is_complex else 'SIMPLE ✓'}\n")
+
         conversation_history = []
         reasoning_steps = []
         structured_tool_outputs = []
         
         # Language-specific instructions
         if language == 'no':
-            language_instruction = "\n\nIMPORTANT: Respond in NORWEGIAN (Norsk). All your thoughts, actions, and final answer must be in Norwegian."
+            language_instruction = "\n\nWICHTIG: Svar på NORSK. Alle dine tanker, handlinger og endelige svar må være på norsk."
             final_answer_label = "ENDELIG SVAR"
         else:
             language_instruction = ""
             final_answer_label = "FINAL ANSWER"
         
-        system_prompt = f"""You are an expert Norwegian financial advisor using Statistics Norway data and advanced financial analysis.{language_instruction}
+        # FIXED SYSTEM PROMPT: More aggressive about data requirements
+        system_prompt = f"""You are an expert Norwegian financial advisor using real-time Statistics Norway (SSB) data. {language_instruction}
 
-Answer questions using this EXACT format:
+OBJECTIVE:
+You MUST provide EVIDENCE-BASED financial advice grounded in actual SSB numbers.
+NEVER answer from training memory if a tool can provide the answer.
+NEVER give generic advice without showing specific numbers from SSB.
 
-THOUGHT: [explain what you need to know and your reasoning]
-ACTION: tool_name(arg1, arg2, ...)
-[wait for observation]
+CRITICAL RULES FOR THIS SESSION:
+1. **ALWAYS SHOW NUMBERS**: Every claim must cite a specific value. Bad: "Norwegians spend on housing." Good: "SSB shows Norwegians spend 11,332 NOK/month on housing."
+2. **ITERATE FULLY**: For complex questions (recommendations, budgets, decisions), you MUST iterate at least 4 times. Do not stop early.
+3. **DATA FIRST, THEN ADVICE**: Retrieve all necessary data BEFORE giving recommendations.
+4. **CITE SOURCES**: Format: "According to SSB Table 10235 (2012), X = Y NOK/month"
+5. **NO GENERIC PHRASES**: Avoid "typically", "generally", "usually" - use SSB numbers instead.
 
-Available tools:
+FORMAT (STRICT):
+- THOUGHT: "What data do I need? Do I have it?"
+- ACTION: Tool call. Example: analyze_budget_health(41667, 11332, 4286, 4000, 3000, 2000)
+- OBSERVATION: [You'll read actual numbers here. CITE THEM in output.]
+- REPEAT 4+ times on complex questions
+- {final_answer_label}: Only after you've gathered sufficient data
 
-BASIC DATA TOOLS:
-- get_spending("category") - get spending for a category like "housing", "food", etc.
-- compare_spending("category1", "category2") - compare two categories
-- get_total_spending() - get total household spending
+MINIMUM ITERATIONS:
+- Simple questions (facts, comparisons): 2 iterations minimum
+- Complex questions (budget, recommendation, decision): 4 iterations minimum
+- Don't rush to {final_answer_label}
 
-ADVANCED ANALYSIS TOOLS (use these for complex questions):
-- analyze_budget_health(income, housing, food, transport, entertainment, other) - analyze financial health score
-- optimize_budget(income, savings_goal, housing, food, transport, entertainment) - optimize budget to meet savings goals
-- assess_lifestyle(income, desired_housing, desired_food, desired_transport, desired_entertainment, savings_rate) - check if lifestyle is affordable
-- detect_anomalies(housing, food, transport, entertainment, income) - detect unusual spending patterns
-- calculate_savings(income, housing, food, transport, entertainment, other) - find savings opportunities
-- evaluate_purchase(price, income, current_savings, monthly_expenses, type) - evaluate major purchase affordability
-- simulate_wealth(monthly_savings, current_savings, years) - simulate future wealth with compound interest (returns chart data)
-- generate_persona(persona, context) - get a persona-driven comment (roast, coach, etc)
+PERSONA: {persona.upper()}
+Apply these communication styles:
+- 'ANALYST': Neutral, data-focused, precise
+- 'ROAST': Humorous, direct critique ("You spend 12k on food? Do you eat gold?")
+- 'COACH': Encouraging, motivational ("You're crushing it! Let's optimize.")
+- 'STRICT': No-nonsense Dave Ramsey style ("Cut discretionary by 40% immediately")
+- 'DEBATE': Multi-agent reasoning (handled separately)
 
-For COMPLEX questions requiring personalized recommendations:
-For COMPLEX questions requiring personalized recommendations:
-1. Use MULTIPLE tools to gather comprehensive data
-2. Analyze from multiple angles (health, optimization, anomalies)
-3. Provide SPECIFIC, ACTIONABLE recommendations
-4. Show your multi-step reasoning clearly
+TOOLS AVAILABLE:
+BASIC: get_spending(category) | compare_spending(cat1, cat2) | get_total_spending()
+ADVANCED: analyze_budget_health(...) | optimize_budget(...) | assess_lifestyle(...) | 
+          detect_anomalies(...) | calculate_savings(...) | evaluate_purchase(...) | 
+          simulate_wealth(monthly_savings, current_savings, years)
 
-After thorough analysis, provide:
-{final_answer_label}: [comprehensive answer with specific recommendations and sources]
-
-Use advanced tools for non-trivial questions. Be thorough and analytical.
-
-CURRENT PERSONA: {persona.upper()}
-
-IMPORTANT: You MUST adopt this persona in your THOUGHTS and FINAL ANSWER.
-- If 'ROAST': Be sarcastic, funny, and brutally honest. Mock bad financial habits. Use emojis like 💀💸.
-- If 'COACH': Be essentially supportive, encouraging, and motivational. Use emojis like 🚀💪.
-- If 'STRICT': Be extremely professional, concise, and efficiency-obsessed. No fluff. Use emojis like 📉🧐.
-- If 'DEBATE': (Covered by multi-agent mode, ignore here).
-
-Internalize this persona NOW. Do not break character."""
+Remember: Your goal is to be HELPFUL + GROUNDED IN DATA. Show your work."""
 
         current_question = f"Question: {question}"
 
         try:
             for iteration in range(self.max_iterations):
-                print(f"--- Iteration {iteration + 1} ---\n")
+                print(f"\n{'─'*80}")
+                print(f"ITERATION {iteration + 1} of {self.max_iterations}")
+                print(f"{'─'*80}\n")
+                
                 if iteration == 0:
                     prompt_text = f"{system_prompt}\n\n{current_question}\n\nLet's think step by step:"
                 else:
                     prompt_text = f"{system_prompt}\n\n{current_question}\n\n"
-                    prompt_text += "\n".join(conversation_history)
+                    prompt_text += "\n".join(conversation_history[-5:])  # Keep last 5 exchanges for context
                     prompt_text += "\n\nContinue reasoning:"
                 
                 try:
@@ -293,45 +384,51 @@ Internalize this persona NOW. Do not break character."""
 
                 # Check for final answer in both languages
                 if "FINAL ANSWER" in llm_output.upper() or "ENDELIG SVAR" in llm_output.upper():
-                    # Try both patterns
+                    # FIX #2: Validate the response before accepting it
                     final_match = re.search(r'(?:FINAL ANSWER|ENDELIG SVAR):?\s*(.+)', llm_output, re.IGNORECASE | re.DOTALL)
                     if final_match:
                         final_answer = final_match.group(1).strip()
-                        print(f"{'='*80}")
-                        print(f"✅ REACHED FINAL ANSWER")
-                        print(f"{'='*80}\n")
-                        return {
-                            "question": question,
-                            "answer": final_answer,
-                            "reasoning_steps": reasoning_steps,
-                            "conversation_history": conversation_history,
-                            "iterations": iteration + 1,
-                            "structured_tools": structured_tool_outputs,
-                            "model": "react_simple (Ollama Llama3.2)"
-                        }
+                        
+                        # Validate response quality
+                        is_valid = self._validate_response(final_answer, iteration, is_complex)
+                        
+                        if is_valid or iteration >= self.max_iterations - 1:
+                            # Accept the answer if valid OR we're at max iterations
+                            print(f"{'='*80}")
+                            print(f"✅ REACHED FINAL ANSWER (Iteration {iteration + 1})")
+                            print(f"{'='*80}\n")
+                            return {
+                                "question": question,
+                                "answer": final_answer,
+                                "reasoning_steps": reasoning_steps,
+                                "conversation_history": conversation_history,
+                                "iterations": iteration + 1,
+                                "structured_tools": structured_tool_outputs,
+                                "model": "react_simple (Ollama Llama3.2)",
+                                "complexity": "COMPLEX" if is_complex else "SIMPLE"
+                            }
+                        else:
+                            # Reject and force continuation
+                            print(f"⚠️ Response lacks sufficient data grounding. Continuing iterations...")
+                            continue
 
+                # Parse and execute tool
                 tool_name, args = self._parse_action(llm_output)
                 if tool_name and args:
                     print(f"🔧 Executing: {tool_name}({args})\n")
                     observation = self._call_tool(tool_name, args)
                     
-                    # Handle structured output (Dict) vs String
-                    if isinstance(observation, dict) and "text" in observation:
-                        text_observation = observation["text"]
-                        if "data" in observation:
-                            structured_tool_outputs.append(observation["data"])
-                    else:
-                        text_observation = str(observation)
-                        
-                    print(f"📊 OBSERVATION:\n{text_observation}\n")
-                    conversation_history.append(f"OBSERVATION: {text_observation}")
+                    print(f"📊 OBSERVATION:\n{observation}\n")
+                    conversation_history.append(f"OBSERVATION: {observation}")
                     reasoning_steps.append({
                         "iteration": iteration + 1,
                         "thought": llm_output,
                         "action": f"{tool_name}({args})",
-                        "observation": text_observation
+                        "observation": observation
                     })
                 else:
+                    # No tool called in this iteration - just reasoning
+                    print(f"💭 [Reasoning step, no tool invocation]\n")
                     reasoning_steps.append({
                         "iteration": iteration + 1,
                         "thought": llm_output,
@@ -339,15 +436,17 @@ Internalize this persona NOW. Do not break character."""
                         "observation": None
                     })
 
-            print(f"⚠️ Max iterations reached\n")
+            # If we exhaust iterations, return best effort
+            print(f"⚠️ Max iterations ({self.max_iterations}) reached without final answer\n")
             return {
                 "question": question,
-                "answer": "Could not reach final answer within iteration limit",
+                "answer": "Could not reach final answer within iteration limit. Consult a financial advisor.",
                 "reasoning_steps": reasoning_steps,
                 "conversation_history": conversation_history,
                 "iterations": self.max_iterations,
                 "structured_tools": structured_tool_outputs,
-                "model": "react_simple (Ollama Llama3.2)"
+                "model": "react_simple (Ollama Llama3.2)",
+                "complexity": "COMPLEX" if is_complex else "SIMPLE"
             }
         except Exception as e:
             print(f"❌ Critical error in ReAct Agent: {e}")
@@ -405,7 +504,6 @@ Internalize this persona NOW. Do not break character."""
             "model": "Fallback (No LLM)"
         }
 
-
     def reason_with_debate(self, question: str, language: str = 'en') -> Dict[str, Any]:
         """
         Research-Grade Feature: Multi-Agent Debate.
@@ -423,11 +521,11 @@ Internalize this persona NOW. Do not break character."""
         # 1. THE GROWTH AGENT (Thesis)
         print("🟢 GROWTH AGENT (Thesis)...")
         growth_prompt = f"""You are the GROWTH AGENT. Your goal is to maximize wealth, suggesting aggressive but viable financial strategies.
-        Ignore safety concerns for a moment and focus on UPSIDE. Use the available data to build a strong case for growth.
+        Ignore safety concerns for a moment and focus on UPSIDE. Use available data to build a strong case for growth.
         
         Question: {question}
         
-        Provide your formatted argument."""
+        Provide your THOUGHT→ACTION→OBSERVATION→RECOMMENDATION reasoning."""
         
         growth_resp = self.llm.invoke(growth_prompt).content
         transcript.append({"agent": "Growth Agent", "color": "#2ecc71", "content": growth_resp})
@@ -436,12 +534,13 @@ Internalize this persona NOW. Do not break character."""
         # 2. THE RISK AGENT (Antithesis)
         print("🔴 RISK AGENT (Antithesis)...")
         risk_prompt = f"""You are the RISK AGENT. Your job is to criticize the Growth Agent's plan.
-        Highlight dangers, volatility, downsides, and what could go wrong. Be the "Devils Advocate".
+        Highlight dangers, volatility, downsides, and what could go wrong. Be the "Devil's Advocate".
+        Use SSB data to support your critique.
         
         Question: {question}
         Growth Agent Proposal: {growth_resp}
         
-        Provide your critique."""
+        Provide your risk-focused THOUGHT→ACTION→OBSERVATION→CRITIQUE reasoning."""
         
         risk_resp = self.llm.invoke(risk_prompt).content
         transcript.append({"agent": "Risk Agent", "color": "#e74c3c", "content": risk_resp})
@@ -449,15 +548,18 @@ Internalize this persona NOW. Do not break character."""
         
         # 3. THE SYNTHESIZER (Synthesis)
         print("🔵 MODERATOR (Synthesis)...")
-        synth_prompt = f"""You are the CHIEF MODERATOR.
-        Review the debate between Growth and Risk agents.
+        synth_prompt = f"""You are the CHIEF MODERATOR. Your job is to synthesize the debate.
         
         Question: {question}
         Growth Argument: {growth_resp}
         Risk Critique: {risk_resp}
         
-        Synthesize a FINAL, BALANCED strategy that captures the best of both worlds.
-        FINAL ANSWER:"""
+        Create a FINAL, BALANCED strategy that:
+        - Captures strengths of both positions
+        - Cites actual SSB numbers
+        - Provides actionable recommendation
+        
+        Format: THOUGHT → ACTION → OBSERVATION → FINAL ANSWER: [balanced recommendation]"""
         
         synth_resp = self.llm.invoke(synth_prompt).content
         transcript.append({"agent": "Synthesizer", "color": "#3498db", "content": synth_resp})
@@ -471,7 +573,6 @@ Internalize this persona NOW. Do not break character."""
         }
 
 
-
 def test_simple_react():
     """Test the simple ReAct agent"""
     print("🧪 Testing Simple ReAct Agent\n")
@@ -479,6 +580,7 @@ def test_simple_react():
     questions = [
         "How much do Norwegian families spend on housing?",
         "Do Norwegians spend more on housing or food?",
+        "I earn 500,000 NOK/year after tax, live in Oslo, have 2 kids, and want to buy a house in 5 years. Create a realistic budget that balances current living standards with my savings goal.",
     ]
     for i, question in enumerate(questions, 1):
         print(f"\n{'#'*80}")
@@ -489,7 +591,7 @@ def test_simple_react():
         print(f"📝 FINAL ANSWER:")
         print(f"{'='*80}")
         print(f"{result['answer']}")
-        print(f"\n✅ Completed in {result['iterations']} iterations")
+        print(f"\n✅ Completed in {result['iterations']} iterations ({result.get('complexity', 'UNKNOWN')})")
         print(f"{'='*80}\n")
     print("✅ All tests complete!")
 
