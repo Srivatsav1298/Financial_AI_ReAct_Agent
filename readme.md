@@ -91,8 +91,24 @@ norfain-react-agent/
 - Complete data grounding using SSB ensures trustworthiness
 - Adaptive reasoning improves performance on complex queries
 
+### Novelty & Robustness Evaluation (50 Tasks)
+
+An expanded evaluation covering 50 complex tasks including adversarial inputs, macro-economic shocks, and multi-agent conflicts.
+
+**Key Findings:**
+- **ReAct excels in Diagnostics & Personas**: Significant gains in tasks requiring multi-step diagnosis (e.g., finding specific spending anomalies) or maintaining specific personas.
+- **Trade-offs**: ReAct is generally slower (1.5x-2x) and sometimes scores lower on simple information retrieval where the Baseline's direct approach is more efficient.
+
+**Notable Performance Differences:**
+| Task Type | Task ID | ReAct Advantage | Description |
+|-----------|---------|-----------------|-------------|
+| Diagnostic | NT30 | +60% | Correctly identified "Chronic Undersaving" where Baseline failed (0%). |
+| Persona | NT48 | +20% | Better adherence to complex "Cycling Personas" instructions. |
+| Judgment | NT2 | +20% | More nuanced assessment of "Lifestyle Affordability". |
+| Shock | NT22 | +10% | Better handling of "Unexpected Medical Bill" scenario. |
+
 ### Future Work
-- Larger evaluation dataset
+- Larger evaluation dataset (Completed: 50-task suite)
 - User study in Norway
 - Real-time SSB integration
 
