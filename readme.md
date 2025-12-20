@@ -37,6 +37,13 @@ Financial AI tools must be **transparent** and **trustworthy**. This project dem
 - 20-question evaluation (4 complexity categories)  
 - Reproducible experiments  
 - GDPR-compliant (no personal data)
+- Real-time grocery price comparison across multiple Norwegian retailers
+- Basket-level optimization to identify the cheapest store combinations
+- Price normalization (per kg / per unit) for accurate comparisons
+- Daily automated data updates with historical price tracking
+- Currency conversion with live exchange rates
+- Smart recommendations based on price gaps and availability
+
 
 ---
 
