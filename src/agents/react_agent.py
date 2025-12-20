@@ -334,7 +334,12 @@ FORMAT (STRICT):
 - ACTION: Tool call. Example: analyze_budget_health(41667, 11332, 4286, 4000, 3000, 2000)
 - OBSERVATION: [You'll read actual numbers here. CITE THEM in output.]
 - REPEAT 4+ times on complex questions
-- {final_answer_label}: Only after you've gathered sufficient data
+- {final_answer_label}: [Your Answer]
+
+CRITICAL: At the very end of your {final_answer_label}, YOU MUST include a section starting with exactly:
+"### Why this matters for you"
+
+In this section, provide a personal, high-impact takeaway (e.g., "This is 10% higher than average," or "This adjustment could save you 5000 NOK/year"). This turns data into insight.
 
 MINIMUM ITERATIONS:
 - Simple questions (facts, comparisons): 2 iterations minimum
