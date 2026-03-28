@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matbørsen v5 - Norfain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'] },
+                    colors: { brand: { dark: '#0f172a', primary: '#10b981' } },
+                    animation: { 'bounce-slow': 'bounce 3s infinite', 'pulse-gentle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gold-rank {
+            border-left: 3px solid #fbbf24;
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.1), transparent);
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col pb-32">
+
+    <!-- Navbar -->
+    <nav class="w-full relative z-50 border-b border-white/10 bg-slate-900/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="cursor-pointer" onclick="window.location.href='/'">
+                    <span
+                        class="text-2xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-500">Norfain</span>
+                </div>
+                <div class="hidden md:flex space-x-6 text-sm font-medium items-center">
+                    <a href="/" class="text-gray-400 hover:text-white transition">Dashboard</a>
+                    <a href="#" class="text-emerald-400 border-b-2 border-emerald-400 pb-1">Matbørsen Pro 🛡️</a>
+
+                    <!-- Notification Center -->
+                    <div class="relative group ml-4">
+                        <button id="alert-bell"
+                            class="relative p-2 text-slate-400 hover:text-white transition group-hover:bg-white/5 rounded-full">
+                            <i class="fas fa-bell"></i>
+                            <span id="alert-count"
+                                class="absolute top-0 right-0 h-4 w-4 bg-red-500 text-[10px] font-bold text-white rounded-full flex items-center justify-center hidden">0</span>
+                        </button>
+                        <!-- Dropdown -->
+                        <div
+                            class="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden group-hover:block z-50 animate-[fadeIn_0.2s_ease-out]">
+                            <div class="p-3 border-b border-white/5 bg-slate-800/50 flex justify-between items-center">
+                                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Alerts & Insights</h3>
+                                <span class="text-[10px] text-slate-500">Today</span>
+                            </div>
+                            <div id="alert-list" class="max-h-64 overflow-y-auto">
+                                <div class="p-8 text-center text-slate-500 text-xs">No new alerts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-grow container mx-auto px-4 py-8 max-w-7xl">
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+            <!-- Sidebar -->
+            <div class="w-full lg:w-72 flex-shrink-0 lg:sticky lg:top-24 max-h-[85vh] flex flex-col gap-4">
+
+                <!-- Savings Projection (Impact) - Hidden by default until basket active -->
+                <div id="impact-card"
+                    class="glass-card p-4 rounded-xl bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border-indigo-500/30 shadow-lg hidden">
+                    <h3 class="text-indigo-300 font-bold text-xs uppercase tracking-wider mb-2"><i
+                            class="fas fa-chart-line mr-1"></i> Your Impact</h3>
+                    <div class="text-center py-2">
+                        <span class="text-3xl font-bold text-white font-mono" id="year-savings">0</span>
+                        <span class="text-sm text-slate-300">kr</span>
+                        <p class="text-[10px] text-slate-400 mt-1 leading-tight">Projected yearly savings by choosing
+                            the cheapest store for this basket.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 overflow-hidden flex flex-col flex-1 max-h-[60vh] shadow-xl">
+                    <!-- Search -->
+                    <div class="relative mb-4">
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-500 text-sm"></i>
+                        <input type="text" id="search-input" placeholder="Find items..."
+                            class="w-full bg-slate-800/50 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition placeholder-slate-500"
+                            oninput="handleSearch(this.value)">
+                    </div>
+
+                    <!-- Navigation -->
+                    <div id="sidebar-tree" class="overflow-y-auto pr-2 space-y-4 flex-1 custom-scrollbar">
+                        <!-- Populated by JS -->
+                        <div class="animate-pulse space-y-2">
+                            <div class="h-4 bg-white/10 rounded w-3/4"></div>
+                            <div class="h-4 bg-white/5 rounded w-1/2 ml-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="flex-1 w-full relative">
+
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+                    <div>
+                        <div class="flex items-center gap-3 text-emerald-400 text-xs font-mono mb-1">
+                            <span class="bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20"><i
+                                    class="fas fa-clock mr-1"></i> Updated Jan 2025 Market Rates</span>
+                            <span class="text-slate-500">•</span>
+                            <span id="live-indicator" class="text-slate-500 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                                Sim Mode
+                            </span>
+                        </div>
+                        <h1 class="text-3xl font-display font-bold text-white tracking-tight">Market Analytics <span
+                                class="text-emerald-400">Pro</span></h1>
+                    </div>
+
+                    <!-- Live Mode Toggle & Key -->
+                    <div class="flex flex-col items-end gap-2 text-right">
+                        <div class="glass-card p-1 rounded-lg flex text-xs font-bold mb-1">
+                            <button onclick="setMode('single')" id="btn-mode-single"
+                                class="px-4 py-1.5 rounded transition bg-emerald-500 text-white shadow-lg">Single
+                                Item</button>
+                            <button onclick="setMode('basket')" id="btn-mode-basket"
+                                class="px-4 py-1.5 rounded transition text-slate-400 hover:text-white">Basket Mode
+                                🧺</button>
+                        </div>
+                        <div
+                            class="flex items-center gap-3 bg-slate-900/50 p-1.5 pl-3 rounded-xl border border-white/5">
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Live Mode</span>
+                            <button onclick="toggleLiveMode()" id="live-toggle"
+                                class="w-10 h-5 bg-slate-700 rounded-full relative transition-colors">
+                                <div id="live-dot"
+                                    class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform">
+                                </div>
+                            </button>
+                        </div>
+                        <div id="api-key-container" class="hidden animate-[fadeIn_0.2s_ease-out]">
+                            <input type="password" id="kassalapp-key" placeholder="Enter Kassalapp API Key..."
+                                class="text-[10px] bg-slate-800 border border-white/10 rounded-lg px-3 py-1.5 text-white w-48 focus:border-emerald-500/50 outline-none"
+                                onchange="saveApiKey(this.value)">
+                            <div class="text-[9px] text-slate-500 mt-1 flex justify-end gap-2 font-medium">
+                                <a href="https://kassal.app/bruker/api" target="_blank"
+                                    class="hover:text-emerald-400 underline">Get free key</a>
+                                <span class="cursor-help"
+                                    title="Your key is stored only on this browser (localStorage) and never leaves your computer.">🔒
+                                    Privacy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Filters -->
+                <div class="flex flex-wrap items-center gap-2 text-xs font-medium mb-8">
+                    <span
+                        class="text-slate-500 uppercase tracking-widest text-[10px] mr-2 font-bold cursor-help group relative">
+                        Smart:
+                        <div
+                            class="absolute bottom-full left-0 mb-2 w-48 bg-slate-900 border border-white/10 p-2 rounded-lg text-slate-300 shadow-xl opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+                            ✨ Smart Mode prioritizes: <br>• Essentials <br>• Large price gaps <br>• Frequently bought
+                        </div>
+                    </span>
+                    <button id="toggle-smart"
+                        class="px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition"
+                        onclick="toggleFilter('smart')">✨ Smart Mode</button>
+                    <button id="toggle-discount"
+                        class="px-3 py-1 rounded-full border border-white/10 hover:bg-white/5 text-slate-400 hover:text-white transition"
+                        onclick="toggleFilter('discount')">🏷 Discounted</button>
+                    <button id="toggle-expensive"
+                        class="px-3 py-1 rounded-full border border-white/10 hover:bg-white/5 text-slate-400 hover:text-white transition"
+                        onclick="toggleFilter('hide_expensive')">👁 Hide Expensive</button>
+
+                    <div class="h-4 w-px bg-white/10 mx-2"></div>
+
+                    <button id="btn-view-personal"
+                        class="px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 transition flex items-center gap-2"
+                        onclick="toggleView('personal')">
+                        <i class="fas fa-heart text-xs"></i> Personal List
+                    </button>
+                </div>
+
+                <!-- Grid -->
+                <div id="grocery-grid" class="space-y-12 transition-opacity duration-300">
+                    <!-- Loading -->
+                    <div class="text-center py-20">
+                        <i class="fas fa-shield-cat fa-spin text-4xl text-emerald-500 mb-4"></i>
+                        <p class="text-slate-500">Analyzing price trends...</p>
+                    </div>
+                </div>
+
+                <!-- Personal List View (Hidden by default) -->
+                <div id="personal-list-view" class="hidden animate-[fadeIn_0.3s_ease-out]">
+                    <div class="glass-card rounded-3xl p-8 border border-indigo-500/20 bg-indigo-900/10 mb-8 font-sans">
+                        <!-- Refined Header -->
+                        <div
+                            class="flex flex-col md:flex-row justify-between items-start gap-8 mb-10 pb-8 border-b border-white/5">
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-500">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                    <h2 class="text-3xl font-bold text-white tracking-tight">My Personal List</h2>
+                                </div>
+                                <p class="text-slate-400 text-sm pl-1">Live tracking and budget optimization for your
+                                    favorites.</p>
+                                <!-- Unified Action Bar -->
+                                <div class="flex flex-wrap items-center gap-2 mt-6">
+                                    <input type="file" id="bill-upload-input" class="hidden" accept="image/*,.heic,.pdf"
+                                        onchange="handleFileUpload(event)">
+                                    <button onclick="document.getElementById('bill-upload-input').click()"
+                                        class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/30 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 group">
+                                        <i class="fas fa-file-invoice group-hover:scale-110 transition"></i> Scan
+                                        Receipt
+                                    </button>
+                                    <button onclick="copyForKeep()"
+                                        class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 group">
+                                        <i class="far fa-copy group-hover:scale-110 transition"></i> Copy for Keep
+                                    </button>
+                                    <button onclick="toggleView('grid')"
+                                        class="bg-white/5 hover:bg-white/10 text-slate-400 px-4 py-2 rounded-xl text-xs font-bold transition border border-white/5">
+                                        Browse More
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-indigo-500/5 rounded-2xl p-6 border border-white/5 min-w-[200px] text-center md:text-right">
+                                <div class="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-bold">
+                                    Selected Total</div>
+                                <div class="text-4xl font-bold text-white font-mono leading-none" id="personal-total">
+                                    0.00 kr</div>
+                                <div class="text-[9px] text-slate-500 mt-2 italic">Prices updated live</div>
+                            </div>
+                        </div>
+
+                        <div id="scan-results-container" class="hidden mb-6">
+                            <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5 fade-in">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-emerald-300 font-bold text-sm flex items-center gap-2">
+                                        <i class="fas fa-wand-magic-sparkles"></i> AI Scan Results
+                                    </h3>
+                                    <button onclick="dismissScanResults()"
+                                        class="text-slate-500 hover:text-white transition"><i
+                                            class="fas fa-times"></i></button>
+                                </div>
+                                <div id="scan-items-list" class="space-y-2">
+                                    <!-- Scanned items injected here -->
+                                </div>
+                                <div class="mt-4 flex justify-end">
+                                    <button onclick="addAllScanned()"
+                                        class="bg-emerald-500 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20">
+                                        Add All to List
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="personal-items-container" class="space-y-4">
+                            <!-- Items injected here -->
+                            <div
+                                class="text-center py-20 text-slate-500 bg-white/5 rounded-2xl border border-dashed border-white/10">
+                                <i class="far fa-heart text-5xl mb-4 opacity-10"></i>
+                                <p class="text-lg">Your list is currently empty</p>
+                                <p class="text-sm opacity-60">Tap the heart on items in the catalog to build
+                                    your
+                                    list.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Basket Footer -->
+    <div id="basket-panel"
+        class="fixed bottom-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-t border-emerald-500/30 transform translate-y-full transition-transform duration-300 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col lg:flex-row items-center justify-between gap-6">
+
+            <div class="flex items-center gap-4 min-w-[200px]">
+                <div
+                    class="bg-gradient-to-br from-emerald-500 to-teal-600 w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 relative">
+                    <i class="fas fa-basket-shopping text-xl"></i>
+                    <div id="footer-savings-badge"
+                        class="absolute -top-2 -right-2 bg-amber-500 text-[10px] font-bold text-black px-1.5 rounded-full border border-white hidden">
+                        Save 50kr!</div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-sm">Weekly Basket</h3>
+                    <p class="text-xs text-slate-400"><span id="basket-count"
+                            class="text-emerald-400 font-bold">0</span> items selected</p>
+                </div>
+            </div>
+
+            <!-- Basket Comparison -->
+            <div class="flex-1 w-full overflow-x-auto pb-2 lg:pb-0">
+                <div id="basket-comparison" class="flex items-center gap-4 min-w-max px-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <button onclick="clearBasket()"
+                class="hidden lg:block px-4 py-2 rounded-lg text-slate-500 text-xs hover:text-red-400 transition hover:bg-white/5">Clear</button>
+        </div>
+    </div>
+
+    <script>
+        let allProducts = [];
+        let basket = {}; // { productId: quantity }
+        let currentMode = 'single';
+        let activeFilters = new Set(['smart']);
+        let searchTerm = '';
+        let openCategories = new Set(['Dairy', 'Produce', 'Big Savings']); // Default open
+        let personalList = new Set();
+        let activeView = 'grid'; // 'grid' or 'personal'
+        let liveMode = false;
+        let kassalappKey = '';
+        let lastLiveFetch = 0; // Timestamp of last success
+        const ICONS = {
+            up: '<i class="fas fa-arrow-trend-up text-[10px] text-red-400"></i>',
+            down: '<i class="fas fa-arrow-trend-down text-[10px] text-emerald-400"></i>',
+            stable: '<i class="fas fa-minus text-[8px] text-slate-600"></i>'
+        };
+
+        // --- Init ---
+        async function fetchGroceries() {
+            try {
+                // Load Personal List
+                const savedList = localStorage.getItem('norfain_personal_list');
+                if (savedList) {
+                    personalList = new Set(JSON.parse(savedList));
+                }
+
+                // Load API Key and Live Mode preference
+                kassalappKey = localStorage.getItem('kassalapp_api_key') || '';
+                liveMode = localStorage.getItem('norfain_live_mode') === 'true';
+                if (kassalappKey) document.getElementById('kassalapp-key').value = kassalappKey;
+
+                updateLiveUI();
+
+                if (liveMode && kassalappKey) {
+                    await fetchRealTimePrices();
+                } else {
+                    const res = await fetch('/api/groceries');
+                    const data = await res.json();
+                    if (data.success) {
+                        allProducts = data.data;
+                        processAlerts();
+                        renderSidebar();
+                        renderGrid();
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                showNotification("Connection error. Using offline catalog.");
+            }
+        }
+
+        function updateLiveUI() {
+            const toggle = document.getElementById('live-toggle');
+            const dot = document.getElementById('live-dot');
+            const indicator = document.getElementById('live-indicator');
+            const keyContainer = document.getElementById('api-key-container');
+
+            if (liveMode) {
+                toggle.classList.add('bg-emerald-500');
+                dot.style.transform = 'translateX(20px)';
+                indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Authentic Live Mode';
+                indicator.classList.remove('text-slate-500');
+                indicator.classList.add('text-emerald-400');
+                keyContainer.classList.remove('hidden');
+            } else {
+                toggle.classList.remove('bg-emerald-500');
+                dot.style.transform = 'translateX(0)';
+                indicator.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span> Sim Mode';
+                indicator.classList.remove('text-emerald-400');
+                indicator.classList.add('text-slate-500');
+                keyContainer.classList.add('hidden');
+            }
+        }
+
+        function toggleLiveMode() {
+            liveMode = !liveMode;
+            localStorage.setItem('norfain_live_mode', liveMode);
+            updateLiveUI();
+
+            if (liveMode && !kassalappKey) {
+                showNotification("Enter your free Kassalapp API key to enable Live Mode!");
+            } else {
+                // Refresh data based on new mode
+                fetchGroceries();
+            }
+        }
+
+        function saveApiKey(val) {
+            // Strip whitespace, "Bearer ", and possible quotes if pasted from some docs
+            kassalappKey = val.trim().replace(/^Bearer\s+/i, '').replace(/['"]/g, '');
+            localStorage.setItem('kassalapp_api_key', kassalappKey);
+            showNotification("API Key saved! Refreshing...");
+            fetchGroceries();
+        }
+
+        async function fetchRealTimePrices() {
+            try {
+                // Rate Limit Protection (60s cooldown)
+                const now = Date.now();
+                if (now - lastLiveFetch < 60000) {
+                    const remaining = Math.ceil((60000 - (now - lastLiveFetch)) / 1000);
+                    showNotification(`Rate limit safety: Please wait ${remaining}s before refreshing live data.`);
+                    // Just use existing data if we have it
+                    if (allProducts.length > 0 && allProducts[0].id.startsWith('live')) return;
+                }
+
+                // Show loading state
+                document.getElementById('grocery-grid').innerHTML = `
+                    <div class="col-span-full py-20 text-center">
+                        <i class="fas fa-spinner fa-spin text-4xl text-emerald-500 mb-4"></i>
+                        <p class="text-slate-400">Connecting to Kassalapp Real-Time API...</p>
+                    </div>`;
+
+                const searchTerms = ['Melk', 'Egg', 'Brød', 'Smør', 'Kjøttdeig', 'Ost', 'Kaffe', 'Solo', 'Sjokolade', 'Agurk'];
+                let realData = [];
+                let hitRateLimit = false;
+                let unauthorized = false;
+                let lastStatus = 200;
+
+                console.log("DEBUG: Starting Live Fetch for terms...", searchTerms);
+
+                // Parallel fetch via our backend proxy
+                const results = await Promise.all(searchTerms.map(term =>
+                    fetch(`/api/proxy/kassalapp?search=${term.toLowerCase()}&size=8`, {
+                        headers: { 'Authorization': `Bearer ${kassalappKey}` }
+                    }).then(r => {
+                        lastStatus = r.status;
+                        if (r.status === 429) hitRateLimit = true;
+                        if (r.status === 401 || r.status === 403) unauthorized = true;
+                        console.log(`DEBUG: Result for ${term}: status ${r.status}`);
+                        return r.status === 200 ? r.json() : { data: [] };
+                    }).catch(e => {
+                        console.error(`Fetch error for ${term}:`, e);
+                        return { data: [] };
+                    })
+                ));
+
+                if (unauthorized) {
+                    showNotification("Invalid API Key! Please check your Kassalapp key.");
+                    throw new Error("Unauthorized");
+                }
+
+                if (hitRateLimit) {
+                    showNotification("Rate limit exceeded! Switching to Sim Mode.");
+                    throw new Error("Rate limit exceeded");
+                }
+
+                const eanGroups = {};
+
+                results.forEach((result, idx) => {
+                    console.log(`DEBUG: Processing result ${idx} (${searchTerms[idx]}):`, result);
+
+                    const itemsList = result.data || (Array.isArray(result) ? result : []);
+
+                    if (itemsList && itemsList.length > 0) {
+                        itemsList.forEach(p => {
+                            // Kassalapp flat structure: p.store and p.current_price
+                            const storeName = p.store ? p.store.name : 'Unknown';
+                            const price = p.current_price || 0;
+                            const ean = p.ean || p.id; // Fallback to ID if no EAN
+
+                            if (!eanGroups[ean]) {
+                                eanGroups[ean] = {
+                                    id: `live_${p.id}`,
+                                    product: p.name,
+                                    category: (p.category && p.category.name) || (p.category && p.category[0] && p.category[0].name) || 'Groceries',
+                                    historical_avg: price,
+                                    is_drop: false,
+                                    is_surge: false,
+                                    trend: 'stable',
+                                    unit: 'kr',
+                                    prices: []
+                                };
+                            }
+
+                            // Add this store's price to the group
+                            eanGroups[ean].prices.push({
+                                store: storeName,
+                                price: price
+                            });
+                        });
+                    }
+                });
+
+                // Convert groups back to array
+                realData = Object.values(eanGroups);
+                console.log(`DEBUG: Total Live Items Mapped (Grouped by EAN): ${realData.length}`);
+
+                if (realData.length > 0) {
+                    allProducts = realData;
+                    lastLiveFetch = Date.now();
+                    renderSidebar();
+                    renderGrid();
+                    showNotification("Live prices active!");
+                } else {
+                    let msg = "No data returned from API.";
+                    if (lastStatus !== 200) msg = `API Error: Status ${lastStatus}.`;
+                    console.error("DEBUG: Live fetch resulted in 0 items.");
+                    showNotification(`${msg} Using sim mode.`);
+                    throw new Error(msg);
+                }
+            } catch (err) {
+                console.error("Live fetch failed", err);
+
+                let errorMsg = "Live Mode connection failed. Using Sim Mode.";
+                if (err.message.includes("Failed to fetch")) {
+                    errorMsg = "Connection Blocked: Browser security (CORS) or Network issue.";
+                } else if (err.message !== "Rate limit exceeded") {
+                    errorMsg = `Error: ${err.message}. Using Sim Mode.`;
+                }
+
+                // If it was a rate limit, don't just "fail" - educate the user
+                if (err.message === "Rate limit exceeded") {
+                    liveMode = false;
+                    updateLiveUI();
+                    localStorage.setItem('norfain_live_mode', false);
+                } else {
+                    showNotification(errorMsg);
+                }
+
+                // Fallback to offline
+                const res = await fetch('/api/groceries');
+                const data = await res.json();
+                if (data.success) {
+                    allProducts = data.data;
+                    processAlerts();
+                    renderSidebar();
+                    renderGrid();
+                }
+            }
+        }
+        // --- Helpers ---
+        function getBestPrice(item) {
+            // Consistency first: always sort the same way
+            const sorted = [...item.prices].sort((a, b) => a.price - b.price);
+            return sorted[0];
+        }
+
+        // --- Notification Logic ---
+        function processAlerts() {
+            // Find drops
+            const drops = allProducts.filter(p => p.is_drop);
+            const alertCount = document.getElementById('alert-count');
+            const alertList = document.getElementById('alert-list');
+
+            if (drops.length > 0) {
+                alertCount.textContent = drops.length;
+                alertCount.classList.remove('hidden');
+
+                alertList.innerHTML = drops.map(p => {
+                    const bestPrice = Math.min(...p.prices.map(s => s.price));
+                    return `
+                        <div class="p-3 border-b border-white/5 hover:bg-white/5 transition flex gap-3 items-start cursor-pointer" onclick="scrollToItem('${p.id}')">
+                            <div class="bg-emerald-500/20 text-emerald-400 w-8 h-8 rounded flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white leading-tight">${p.product} dropped to ${bestPrice.toFixed(0)}kr!</p>
+                                <p class="text-[10px] text-slate-400">Usually ${p.historical_avg.toFixed(0)}kr. Save big today.</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // --- Sidebar ---
+        function renderSidebar() {
+            const container = document.getElementById('sidebar-tree');
+            container.innerHTML = '';
+
+            // 1. High Impact Savings (Radar)
+            const bigSavings = allProducts.map(p => {
+                const prices = p.prices.map(s => s.price);
+                return { ...p, gap: Math.max(...prices) - Math.min(...prices) };
+            }).filter(p => p.gap > 15).sort((a, b) => b.gap - a.gap).slice(0, 5);
+
+            if (!searchTerm && bigSavings.length > 0) {
+                renderSidebarSection(container, '💰 Price Radar', bigSavings, true);
+            }
+
+            // 2. Categories
+            const groups = groupBy(allProducts, 'category');
+            Object.keys(groups).forEach(cat => {
+                const items = groups[cat].filter(p => !searchTerm || p.product.toLowerCase().includes(searchTerm.toLowerCase()));
+                if (items.length === 0) return;
+
+                const isOpen = searchTerm ? true : openCategories.has(cat);
+
+                const catDiv = document.createElement('div');
+                catDiv.className = 'mb-1';
+                catDiv.innerHTML = `
+                    <button class="w-full text-left px-3 py-1.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider hover:text-white transition flex justify-between items-center group"
+                        onclick="toggleCategory('${cat}')">
+                        <span>${cat}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-white/5 px-1.5 rounded text-[10px] text-slate-600 group-hover:text-slate-400">${items.length}</span>
+                            <i class="fas fa-chevron-${isOpen ? 'down' : 'right'} text-[10px]"></i>
+                        </div>
+                    </button>
+                `;
+
+                if (isOpen) {
+                    const list = document.createElement('div');
+                    list.className = 'ml-2 pl-2 border-l border-white/5 space-y-0.5 animate-[fadeIn_0.2s_ease-out]';
+                    items.forEach(p => list.appendChild(createSidebarItem(p)));
+                    catDiv.appendChild(list);
+                }
+                container.appendChild(catDiv);
+            });
+        }
+
+        function renderSidebarSection(container, title, items, forceOpen) {
+            const section = document.createElement('div');
+            section.className = 'mb-4 pb-4 border-b border-white/5';
+            section.innerHTML = `<h3 class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2 px-3">${title}</h3>`;
+            const list = document.createElement('div');
+            list.className = 'space-y-0.5';
+            items.forEach(p => list.appendChild(createSidebarItem(p, true)));
+            section.appendChild(list);
+            container.appendChild(section);
+        }
+
+        function createSidebarItem(p, showGap = false) {
+            const bestPrice = Math.min(...p.prices.map(s => s.price));
+            const btn = document.createElement('button');
+            btn.className = 'w-full text-left px-3 py-1.5 text-xs text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded transition flex justify-between items-center group';
+            btn.onclick = () => scrollToItem(p.id);
+
+            let rightLabel = `<div class="flex items-center gap-1.5 opacity-60 group-hover:opacity-100">
+                                 <span class="tabular-nums font-mono text-[10px] text-emerald-500">${bestPrice.toFixed(0)}</span>
+                                 ${ICONS[p.trend] || ICONS.stable}
+                               </div>`;
+            if (showGap) {
+                rightLabel = `<div class="flex items-center gap-1">
+                                 <span class="text-[10px] text-emerald-400 font-bold">+${p.gap.toFixed(0)}</span>
+                               </div>`;
+            }
+
+            btn.innerHTML = `
+                 <span class="truncate pr-2">${p.product}</span>
+                 ${rightLabel}
+             `;
+            return btn;
+        }
+
+        function toggleCategory(cat) {
+            if (openCategories.has(cat)) openCategories.delete(cat);
+            else openCategories.add(cat);
+            renderSidebar();
+        }
+
+        function scrollToItem(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.querySelector('.glass-card').classList.add('ring-2', 'ring-emerald-500');
+                setTimeout(() => el.querySelector('.glass-card').classList.remove('ring-2', 'ring-emerald-500'), 1500);
+            }
+        }
+
+        // --- Grid ---
+        function renderGrid() {
+            const grid = document.getElementById('grocery-grid');
+            grid.innerHTML = '';
+
+            let displayProducts = allProducts.filter(p => !searchTerm || p.product.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            if (activeFilters.has('smart')) {
+                displayProducts.sort((a, b) => {
+                    const gapA = Math.max(...a.prices.map(s => s.price)) - Math.min(...a.prices.map(s => s.price));
+                    const gapB = Math.max(...b.prices.map(s => s.price)) - Math.min(...b.prices.map(s => s.price));
+                    return gapB - gapA;
+                });
+            }
+
+            const cardGrid = document.createElement('div');
+            cardGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+            displayProducts.forEach(item => cardGrid.appendChild(createCard(item)));
+
+            grid.appendChild(cardGrid);
+        }
+
+        function createCard(item) {
+            const el = document.createElement('div');
+            el.id = item.id;
+
+            const best = getBestPrice(item);
+            const bestPrice = best.price;
+            const sortedPrices = [...item.prices].sort((a, b) => a.price - b.price);
+            const worstPrice = sortedPrices[sortedPrices.length - 1].price;
+            const gap = worstPrice - bestPrice;
+            const unit = item.unit || 'kr';
+
+            // Alerts Logic
+            let alertBadge = '';
+            let borderClass = 'hover:border-emerald-500/30';
+
+            if (item.is_surge) {
+                alertBadge = `<div class="mb-2"><span class="bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider"><i class="fas fa-triangle-exclamation mr-1"></i> High Surge (+25%)</span></div>`;
+                borderClass = 'border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]';
+            }
+            if (item.is_drop) {
+                alertBadge = `<div class="mb-2"><span class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider"><i class="fas fa-bolt mr-1"></i> Price Drop!</span></div>`;
+            }
+
+            const html = `
+                <div class="glass-card rounded-xl overflow-hidden group transition duration-300 ${borderClass} flex flex-col h-full relative">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-4 border-b border-white/5 flex justify-between items-start">
+                        <div>
+                             ${alertBadge}
+                             <h3 class="font-bold text-white text-sm leading-tight mb-1">${item.product}</h3>
+                             <div class="text-[10px] text-slate-500 flex items-center gap-2">
+                                <span class="bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-bold">${bestPrice.toFixed(2)} ${unit}</span>
+                                ${gap > 1 ? `<span class="text-slate-600">Gap: +${gap.toFixed(0)}</span>` : ''}
+                             </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                             <div class="glass-card bg-black/20 w-8 h-8 rounded flex items-center justify-center cursor-pointer hover:text-pink-500 transition-colors ${personalList.has(item.id) ? 'text-pink-500' : 'text-slate-600'}" 
+                                  onclick="togglePersonal('${item.id}')" title="Add to Personal List">
+                                <i class="${personalList.has(item.id) ? 'fas' : 'far'} fa-heart"></i>
+                             </div>
+                             <div class="glass-card bg-black/20 w-8 h-8 rounded flex items-center justify-center" title="Price Trend">
+                                ${ICONS[item.trend || 'stable'].replace('text-[10px]', 'text-sm')}
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 space-y-1 flex-1">
+                        ${sortedPrices.map((store, idx) => {
+                if (activeFilters.has('hide_expensive') && idx > 1) return '';
+                let rowClass = 'border-transparent opacity-80';
+                if (idx === 0) rowClass = 'gold-rank bg-amber-500/5 opacity-100';
+
+                return `
+                                <div class="flex justify-between items-center px-2 py-1.5 rounded text-xs border-l-2 ${rowClass}">
+                                    <span class="text-slate-300 font-medium">${store.store}</span>
+                                    <div class="flex gap-2 tabular-nums">
+                                         ${idx === 0 ? '<i class="fas fa-trophy text-amber-500"></i>' : ''}
+                                         <span class="${idx === 0 ? 'text-white font-bold' : 'text-slate-400'}">${store.price.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                             `;
+            }).join('')}
+                        ${activeFilters.has('hide_expensive') ? `<div class="text-[10px] text-center text-slate-600 pt-2 italic">Others hidden</div>` : ''}
+                        
+                        <div class="mt-4 pt-3 border-t border-white/5 text-[10px] text-slate-500 flex justify-between items-center">
+                            <span>Avg: <span class="text-slate-400 underline decoration-dotted cursor-help" title="Historical Average Price">${item.historical_avg}kr</span></span>
+                            <span class="bg-white/5 px-1.5 rounded text-slate-600">5/5 stores</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 pt-0 bg-slate-900/20">
+                         <div class="flex items-center justify-between py-2 basket-actions ${currentMode === 'basket' ? '' : 'hidden'}">
+                             <button onclick="updateBasket('${item.id}', -1)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-slate-400 transition">-</button>
+                             <span class="font-mono text-sm font-bold w-6 text-center basket-qty text-slate-600" data-id="${item.id}">0</span>
+                             <button onclick="updateBasket('${item.id}', 1)" class="w-8 h-8 rounded bg-emerald-500 hover:bg-emerald-400 text-white transition shadow-lg shadow-emerald-500/20">+</button>
+                         </div>
+                         <div class="py-2 text-center basket-cta ${currentMode === 'single' ? '' : 'hidden'}">
+                              <button onclick="setMode('basket'); updateBasket('${item.id}', 1)" class="text-xs text-emerald-400 font-bold hover:text-emerald-300 transition">Start Basket</button>
+                         </div>
+                    </div>
+                </div>
+            `;
+            el.innerHTML = html;
+            return el;
+        }
+
+        // --- Basket Logic ---
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-mode-single').className = `px-4 py-1.5 rounded transition ${mode === 'single' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`;
+            document.getElementById('btn-mode-basket').className = `px-4 py-1.5 rounded transition ${mode === 'basket' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`;
+
+            document.querySelectorAll('.basket-actions').forEach(el => el.classList.toggle('hidden', mode !== 'basket'));
+            document.querySelectorAll('.basket-cta').forEach(el => el.classList.toggle('hidden', mode !== 'single'));
+
+            // Toggle Impact Sidebar
+            const impact = document.getElementById('impact-card');
+            if (mode === 'basket') impact.classList.remove('hidden');
+            else impact.classList.add('hidden');
+
+            calculateBasketTotals();
+        }
+
+        function updateBasket(id, change) {
+            if (!basket[id]) basket[id] = 0;
+            basket[id] += change;
+            if (basket[id] <= 0) delete basket[id];
+
+            const qtyEl = document.querySelector(`.basket-qty[data-id="${id}"]`);
+            if (qtyEl) {
+                const count = basket[id] || 0;
+                qtyEl.textContent = count;
+                qtyEl.className = `font-mono text-sm font-bold w-6 text-center basket-qty ${count > 0 ? 'text-white' : 'text-slate-600'}`;
+                const card = document.getElementById(id).querySelector('.glass-card');
+                if (count > 0) card.classList.add('border-emerald-500/50', 'bg-emerald-500/5');
+                else card.classList.remove('border-emerald-500/50', 'bg-emerald-500/5');
+            }
+            calculateBasketTotals();
+        }
+
+        function clearBasket() {
+            basket = {};
+            renderGrid();
+            calculateBasketTotals();
+        }
+
+        function calculateBasketTotals() {
+            const count = Object.values(basket).reduce((a, b) => a + b, 0);
+            document.getElementById('basket-count').textContent = count;
+            const panel = document.getElementById('basket-panel');
+
+            if (count > 0 && currentMode === 'basket') panel.classList.remove('translate-y-full');
+            else panel.classList.add('translate-y-full');
+
+            if (count === 0) {
+                document.getElementById('year-savings').textContent = "0";
+                return;
+            }
+
+            const storeTotals = { 'Kiwi': 0, 'Rema 1000': 0, 'Meny': 0, 'Coop Prix': 0, 'Europris': 0 };
+            Object.keys(basket).forEach(id => {
+                const qty = basket[id];
+                const item = allProducts.find(p => p.id === id);
+                if (item) item.prices.forEach(s => { if (storeTotals[s.store] !== undefined) storeTotals[s.store] += s.price * qty; });
+            });
+
+            const sortedStores = Object.entries(storeTotals).sort((a, b) => a[1] - b[1]);
+            const bestTotal = sortedStores[0][1];
+            const worstTotal = sortedStores[sortedStores.length - 1][1];
+
+            // Impact Calculation (Weekly Savings * 52)
+            const weeklySavings = worstTotal - bestTotal;
+            const yearlySavings = weeklySavings * 52;
+            document.getElementById('year-savings').textContent = yearlySavings.toLocaleString();
+
+            const compDiv = document.getElementById('basket-comparison');
+            compDiv.innerHTML = sortedStores.map((s, idx) => {
+                const [name, total] = s;
+                const diff = total - bestTotal;
+                const isBest = idx === 0;
+
+                // Near Tie Logic
+                let extraMsg = '';
+                if (!isBest && diff < 5) extraMsg = `<div class="text-[9px] text-amber-300 font-bold mt-1">Only +${diff.toFixed(0)}kr diff</div>`;
+                else if (!isBest) extraMsg = `<div class="text-[9px] text-slate-500 mt-1 cursor-help" title="Possible Savings">+${diff.toFixed(0)}kr diff</div>`;
+
+                if (isBest) {
+                    return `
+                    <div class="flex flex-col bg-gradient-to-br from-emerald-500 to-emerald-600 text-white px-5 py-3 rounded-xl shadow-lg border border-emerald-400">
+                        <div class="text-[10px] font-bold uppercase tracking-wider opacity-90 mb-1">Winner</div>
+                        <div class="text-xl font-bold font-mono leading-none mb-1">${total.toFixed(0)} <span class="text-sm font-sans">kr</span></div>
+                        <div class="text-[10px] font-medium bg-black/20 px-1.5 py-0.5 rounded inline-block self-start">${name}</div>
+                    </div>`;
+                } else {
+                    return `
+                    <div class="flex flex-col bg-slate-800 text-slate-400 px-4 py-2 rounded-lg border border-white/5 opacity-90 min-w-[110px]">
+                        <span class="text-[10px] font-bold uppercase tracking-wider mb-1">${name}</span>
+                        <div class="text-lg font-bold font-mono text-slate-200">${total.toFixed(0)} kr</div>
+                        ${extraMsg}
+                    </div>`;
+                }
+            }).join('');
+        }
+
+        function handleSearch(val) {
+            searchTerm = val;
+            renderSidebar();
+            renderGrid();
+        }
+
+        function toggleFilter(filter) {
+            if (activeFilters.has(filter)) activeFilters.delete(filter);
+            else activeFilters.add(filter);
+
+            // visual toggle
+            const btn = document.getElementById(`toggle-${filter.replace('_', '')}`);
+            if (btn) {
+                if (activeFilters.has(filter)) {
+                    btn.classList.add('bg-emerald-500/10', 'text-emerald-300', 'border-emerald-500/30');
+                    btn.classList.remove('text-slate-400', 'hover:text-white');
+                } else {
+                    btn.classList.remove('bg-emerald-500/10', 'text-emerald-300', 'border-emerald-500/30');
+                    btn.classList.add('text-slate-400', 'hover:text-white');
+                }
+            }
+
+            renderGrid();
+        }
+
+        // --- Personal List Logic ---
+        function togglePersonal(id) {
+            if (personalList.has(id)) {
+                personalList.delete(id);
+            } else {
+                personalList.add(id);
+            }
+
+            // Save state
+            localStorage.setItem('norfain_personal_list', JSON.stringify([...personalList]));
+
+            if (activeView === 'personal') {
+                renderPersonalList();
+            } else {
+                // Just update the icon in grid view without full re-render
+                const card = document.getElementById(id);
+                if (card) {
+                    const iconContainer = card.querySelector('.fa-heart').parentElement;
+                    const icon = card.querySelector('.fa-heart');
+
+                    if (personalList.has(id)) {
+                        iconContainer.classList.remove('text-slate-600');
+                        iconContainer.classList.add('text-pink-500');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+
+                        // Small animation
+                        iconContainer.classList.add('scale-125');
+                        setTimeout(() => iconContainer.classList.remove('scale-125'), 200);
+                    } else {
+                        iconContainer.classList.add('text-slate-600');
+                        iconContainer.classList.remove('text-pink-500');
+                        icon.classList.add('far');
+                        icon.classList.remove('fas');
+                    }
+                }
+            }
+        }
+
+        function toggleView(view) {
+            activeView = view;
+            const grid = document.getElementById('grocery-grid');
+            const personalView = document.getElementById('personal-list-view');
+            const btn = document.getElementById('btn-view-personal');
+
+            if (view === 'personal') {
+                grid.classList.add('hidden');
+                personalView.classList.remove('hidden');
+                renderPersonalList();
+
+                // Update Button State
+                btn.classList.add('bg-indigo-500', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                btn.classList.remove('bg-indigo-500/10', 'text-indigo-300');
+            } else {
+                grid.classList.remove('hidden');
+                personalView.classList.add('hidden');
+                renderGrid(); // Refresh grid to ensure heart icons are correct
+
+                // Reset Button State
+                btn.classList.remove('bg-indigo-500', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                btn.classList.add('bg-indigo-500/10', 'text-indigo-300');
+            }
+        }
+
+        function renderPersonalList() {
+            const container = document.getElementById('personal-items-container');
+            const items = allProducts.filter(p => personalList.has(p.id));
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 text-slate-500 border border-dashed border-white/10 rounded-xl">
+                        <i class="far fa-heart text-4xl mb-4 opacity-30"></i>
+                        <p class="text-lg font-medium text-slate-400">Your list is empty</p>
+                        <p class="text-xs mt-2">Tap the heart icon on any product to track it here.</p>
+                        <button onclick="toggleView('grid')" class="mt-6 text-emerald-400 hover:text-emerald-300 text-sm font-bold">Browse Groceries →</button>
+                    </div>`;
+                document.getElementById('personal-total').textContent = '0 kr';
+                return;
+            }
+
+            // Group items by Best Store
+            const grouped = {};
+            items.forEach(p => {
+                const best = getBestPrice(p);
+                if (!grouped[best.store]) grouped[best.store] = [];
+                grouped[best.store].push({ ...p, bestIdx: best });
+            });
+
+            let html = '';
+
+            // Sort stores alphabetically or by count? Let's do alphabetical
+            Object.keys(grouped).sort().forEach(store => {
+                const storeItems = grouped[store];
+                html += `
+                    <div class="mb-6 fade-in">
+                        <div class="flex items-center gap-2 mb-3 px-2">
+                             <div class="bg-indigo-500/20 text-indigo-300 w-6 h-6 rounded flex items-center justify-center text-xs">
+                                <i class="fas fa-store"></i>
+                             </div>
+                             <h3 class="text-indigo-200 font-bold text-sm tracking-wide uppercase">${store}</h3>
+                             <span class="text-xs text-slate-500">(${storeItems.length} items)</span>
+                        </div>
+                        <div class="space-y-3">
+                `;
+
+                html += storeItems.map(p => {
+                    const best = p.bestIdx;
+                    return `
+                    <div class="bg-slate-800/50 hover:bg-slate-800 border border-white/5 rounded-xl p-4 flex items-center justify-between group transition-colors ml-2">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center justify-center -ml-1">
+                                 <input type="checkbox" class="w-5 h-5 rounded border-slate-600 bg-slate-700/50 text-emerald-500 focus:ring-emerald-500/50 cursor-pointer personal-checkbox" 
+                                        data-price="${best.price}" onchange="updatePersonalTotal()">
+                            </div>
+
+                            <div>
+                                <h3 class="font-bold text-white text-sm">${p.product}</h3>
+                                <div class="text-xs text-slate-500 flex items-center gap-2">
+                                    <span class="text-emerald-400 font-mono">${best.price.toFixed(2)} kr</span>
+                                    <span class="text-[10px] bg-slate-700 px-1.5 rounded text-slate-400">${p.category}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            <button onclick="togglePersonal('${p.id}')" class="w-8 h-8 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 flex items-center justify-center transition">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                   `;
+                }).join('');
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+            updatePersonalTotal();
+        }
+
+        function updatePersonalTotal() {
+            let sum = 0;
+            const checkboxes = document.querySelectorAll('.personal-checkbox');
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    sum += parseFloat(cb.dataset.price);
+                }
+            });
+            document.getElementById('personal-total').textContent = sum.toFixed(2) + ' kr';
+        }
+
+        async function copyForKeep() {
+            const items = allProducts.filter(p => personalList.has(p.id));
+            if (items.length === 0) return;
+
+            const grouped = {};
+            items.forEach(p => {
+                const best = [...p.prices].sort((a, b) => a.price - b.price)[0];
+                if (!grouped[best.store]) grouped[best.store] = [];
+                grouped[best.store].push(p.product);
+            });
+
+            let text = "🛒 Min Matbørsen Huskeliste\n\n";
+            Object.keys(grouped).sort().forEach(store => {
+                text += `📍 ${store}\n`;
+                grouped[store].forEach(name => text += `[ ] ${name}\n`);
+                text += "\n";
+            });
+
+            try {
+                await navigator.clipboard.writeText(text);
+                const btn = document.querySelector('button[onclick="copyForKeep()"]');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.add('text-emerald-400');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('text-emerald-400');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+                alert("Could not copy list. Please ensure you gave permission.");
+            }
+        }
+
+        let pendingScannedItems = [];
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // UI state: Scanning
+            const btn = document.querySelector('button[onclick*="bill-upload-input"]');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/analyze-bill', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success && result.items.length > 0) {
+                    pendingScannedItems = result.items;
+                    renderScanResults(result.items);
+                } else {
+                    alert(result.message || "No grocery items detected on this receipt. Try a clearer photo.");
+                }
+            } catch (err) {
+                console.error("Upload error:", err);
+                alert("Failed to process bill. Ensure server is running.");
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                event.target.value = ''; // Reset input
+            }
+        }
+
+        function renderScanResults(items) {
+            const container = document.getElementById('scan-results-container');
+            const list = document.getElementById('scan-items-list');
+            container.classList.remove('hidden');
+            container.classList.remove('animate-pulse');
+
+            list.innerHTML = items.map(item => `
+                <div class="flex items-center justify-between text-xs text-slate-300 bg-white/5 p-2 rounded-lg border border-white/5">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle text-emerald-500"></i>
+                        <span class="font-medium">${item.product}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-emerald-400 capitalize">${item.best_price.toFixed(2)} kr</span>
+                        <span class="text-[9px] text-slate-500">@ ${item.prices.find(p => p.is_cheapest).store}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function dismissScanResults() {
+            document.getElementById('scan-results-container').classList.add('hidden');
+            pendingScannedItems = [];
+        }
+
+        function addAllScanned() {
+            pendingScannedItems.forEach(item => {
+                // Sync Prices: If this item already exists in allProducts, update its price data
+                // This ensures consistency between the Scan UI and the Personal List
+                const existingIdx = allProducts.findIndex(p => p.id === item.id);
+                if (existingIdx !== -1) {
+                    allProducts[existingIdx].prices = item.prices;
+                } else {
+                    allProducts.push(item);
+                }
+
+                personalList.add(item.id);
+            });
+            savePersonalList();
+            renderPersonalList();
+            dismissScanResults();
+            renderGrid(); // Also refresh grid to show updated prices if visible
+
+            // Show toast or alert
+            showNotification(`Added ${pendingScannedItems.length} items to your list!`);
+        }
+
+        function showNotification(msg) {
+            const div = document.createElement('div');
+            div.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-3 rounded-full shadow-2xl z-[100] animate-bounce';
+            div.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${msg}`;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+
+        function groupBy(arr, key) {
+            return arr.reduce((acc, obj) => {
+                (acc[obj[key]] = acc[obj[key]] || []).push(obj);
+                return acc;
+            }, {});
+        }
+
+        // Handle context from Activation Flow
+        window.onload = function () {
+            fetchGroceries();
+
+            // Check for context from dashboard
+            const context = localStorage.getItem('norfain_context');
+            if (context) {
+                try {
+                    const data = JSON.parse(context);
+                    // Only use context if it's recent (within last 10 seconds)
+                    if (Date.now() - data.timestamp < 10000) {
+                        // Show context banner
+                        showContextBanner(data);
+
+                        // Auto-focus search if category is Food
+                        if (data.category === 'Food') {
+                            setTimeout(() => {
+                                const searchInput = document.getElementById('searchInput');
+                                if (searchInput) {
+                                    searchInput.focus();
+                                    searchInput.placeholder = 'Search food items to compare prices...';
+                                }
+                            }, 500);
+                        }
+
+                        // Clear context after use
+                        localStorage.removeItem('norfain_context');
+                    }
+                } catch (e) {
+                    console.error('Failed to parse context:', e);
+                }
+            }
+        };
+
+        // Show context banner
+        function showContextBanner(data) {
+            const banner = document.createElement('div');
+            banner.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-40 glass-card p-3 rounded-xl border border-emerald-500/30 shadow-2xl max-w-md animate-slide-down';
+            banner.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-lightbulb text-emerald-400 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs font-semibold text-white">Suggested due to rising food inflation</p>
+                        <p class="text-[10px] text-slate-400">Compare prices to find savings</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-slate-500 hover:text-white">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(banner);
+
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                banner.style.opacity = '0';
+                banner.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => banner.remove(), 300);
+            }, 8000);
+        }
+    </script>
+</body>
+
+</html>

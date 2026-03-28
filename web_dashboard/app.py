@@ -459,6 +459,34 @@ def index():
         'Vary': 'Accept-Encoding'
     }
 
+@app.route('/prisjakt')
+def prisjakt_page():
+    """Price comparison page"""
+    return render_template('prisjakt.html'), 200, {
+        'Cache-Control': 'public, max-age=3600'
+    }
+
+@app.route('/groceries')
+def groceries_page():
+    """Food price analysis (Matbørsen)"""
+    return render_template('groceries.html'), 200, {
+        'Cache-Control': 'public, max-age=3600'
+    }
+
+@app.route('/savings-tracker')
+def savings_tracker_page():
+    """Savings goals tracker"""
+    return render_template('savings-tracker.html'), 200, {
+        'Cache-Control': 'public, max-age=3600'
+    }
+
+@app.route('/thesis')
+def thesis_page():
+    """Thesis information page"""
+    return render_template('thesis.html'), 200, {
+        'Cache-Control': 'public, max-age=3600'
+    }
+
 @app.route('/api/ask', methods=['POST'])
 def ask_question():
     """
@@ -482,6 +510,7 @@ def ask_question():
 
         question = str(data.get('question', '')).strip()
         language = str(data.get('language', 'en')).strip()
+        persona = str(data.get('persona', 'analyst')).strip()
 
         # Input validation
         is_valid, error_msg = Validator.validate_question(question)
@@ -520,7 +549,11 @@ def ask_question():
 
         try:
             react_start = time.time()
-            react_result = react_agent.answer_question(question, language=language)
+            # Check for special debate persona
+            if persona == 'debate':
+                react_result = react_agent.reason_with_debate(question, language=language)
+            else:
+                react_result = react_agent.answer_question(question, language=language, persona=persona)
             react_time = time.time() - react_start
         except Exception as e:
             logger.error(f"ReAct agent error: {e}", exc_info=True)
@@ -545,7 +578,8 @@ def ask_question():
                 'time': round(react_time, 3),
                 'iterations': int(react_result.get('iterations', 0)),
                 'reasoning_steps': react_result.get('reasoning_steps', [])[:10],  # Limit to 10
-                'model': str(react_result.get('model', 'unknown'))
+                'model': str(react_result.get('model', 'unknown')),
+                'persona': persona if persona != 'analyst' else None
             },
             'comparison': {
                 'time_difference': round(react_time - baseline_time, 3),
@@ -720,6 +754,297 @@ def get_stats():
     except Exception as e:
         logger.error(f"Error in get_stats: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
+
+# ============================================================================
+# ADVANCED FEATURES API
+# ============================================================================
+
+@app.route('/api/prisjakt/products', methods=['GET'])
+def get_prisjakt_products():
+    """
+    Returns curated product data with authentic Norwegian prices.
+    Includes price comparison across retailers.
+    Cache: 24 hours (static product database)
+    """
+    try:
+        # Check cache first
+        if cache:
+            cached = cache.get('prisjakt_products')
+            if cached:
+                return jsonify(cached)
+
+        # Load product database
+        products_file = Path(__file__).parent / "data" / "products.json"
+        if not products_file.exists():
+            return jsonify({'error': 'Product database not found'}), 404
+
+        with open(products_file, 'r', encoding='utf-8') as f:
+            products = json.load(f)
+
+        # Cache for 24 hours
+        if cache:
+            cache.set('prisjakt_products', products, ttl=86400)
+
+        return jsonify({
+            'success': True,
+            'count': len(products),
+            'data': products
+        })
+
+    except json.JSONDecodeError as e:
+        logger.error(f"Products JSON parse error: {e}")
+        return jsonify({'error': 'Product data corrupted'}), 500
+    except Exception as e:
+        logger.error(f"Error in get_prisjakt_products: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/cpi', methods=['GET'])
+def get_cpi_data():
+    """Get Consumer Price Index data for inflation adjustments"""
+    try:
+        # Check cache
+        if cache:
+            cached = cache.get('cpi_data')
+            if cached:
+                return jsonify(cached)
+
+        # Request fresh CPI data from SSB
+        try:
+            multipliers = ssb_api.get_cpi_adjustments()
+            # Get current index and baseline
+            current_index = multipliers.get('TOTAL', 1.0) * 122.7  # 2022 baseline
+            baseline_year = '2022'
+            multiplier = multipliers.get('TOTAL', 1.0)
+
+            response_data = {
+                'success': True,
+                'data': {
+                    'index': round(current_index, 1),
+                    'reference_base': '2015=100',
+                    'baseline_year': baseline_year,
+                    'yoy_change': round((multiplier - 1) * 100, 2),
+                    'multiplier': round(multiplier, 4)
+                }
+            }
+
+            if cache:
+                cache.set('cpi_data', response_data, ttl=86400)  # 24 hours
+
+            return jsonify(response_data)
+
+        except Exception as e:
+            logger.warning(f"CPI fetch failed: {e}")
+            # Return fallback static data
+            fallback = {
+                'success': True,
+                'data': {
+                    'index': 135.2,
+                    'reference_base': '2015=100',
+                    'baseline_year': '2022',
+                    'yoy_change': 10.2,
+                    'multiplier': 1.102
+                },
+                'note': 'Using cached CPI data (live fetch failed)'
+            }
+            return jsonify(fallback)
+
+    except Exception as e:
+        logger.error(f"Error in get_cpi: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+# Simple goals storage (in production, use database)
+_goals_store = []
+
+@app.route('/api/goals', methods=['GET'])
+def get_goals():
+    """Get all savings goals"""
+    return jsonify({
+        'success': True,
+        'goals': _goals_store
+    })
+
+@app.route('/api/goals', methods=['POST'])
+def create_goal():
+    """Create a new savings goal"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        required = ['name', 'target_amount', 'monthly_contribution']
+        for field in required:
+            if field not in data:
+                return jsonify({'error': f'Missing field: {field}'}), 400
+
+        goal = {
+            'id': f"goal_{len(_goals_store) + 1}",
+            'name': str(data['name'])[:100],
+            'target_amount': float(data['target_amount']),
+            'monthly_contribution': float(data['monthly_contribution']),
+            'current_savings': float(data.get('current_savings', 0)),
+            'deadline': data.get('deadline'),
+            'created_at': datetime.utcnow().isoformat() + 'Z'
+        }
+
+        _goals_store.append(goal)
+
+        return jsonify({
+            'success': True,
+            'goal': goal
+        }), 201
+
+    except ValueError as e:
+        return jsonify({'error': f'Invalid number format: {str(e)}'}), 400
+    except Exception as e:
+        logger.error(f"Error creating goal: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/goals/<goal_id>', methods=['PUT'])
+def update_goal(goal_id):
+    """Update a savings goal"""
+    try:
+        data = request.get_json()
+        goal = next((g for g in _goals_store if g['id'] == goal_id), None)
+
+        if not goal:
+            return jsonify({'error': 'Goal not found'}), 404
+
+        # Update fields
+        if 'name' in data:
+            goal['name'] = str(data['name'])[:100]
+        if 'target_amount' in data:
+            goal['target_amount'] = float(data['target_amount'])
+        if 'monthly_contribution' in data:
+            goal['monthly_contribution'] = float(data['monthly_contribution'])
+        if 'current_savings' in data:
+            goal['current_savings'] = float(data['current_savings'])
+        if 'deadline' in data:
+            goal['deadline'] = data['deadline']
+
+        goal['updated_at'] = datetime.utcnow().isoformat() + 'Z'
+
+        return jsonify({
+            'success': True,
+            'goal': goal
+        })
+
+    except ValueError as e:
+        return jsonify({'error': f'Invalid number format: {str(e)}'}), 400
+    except Exception as e:
+        logger.error(f"Error updating goal: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/goals/<goal_id>', methods=['DELETE'])
+def delete_goal(goal_id):
+    """Delete a savings goal"""
+    global _goals_store
+    initial_len = len(_goals_store)
+    _goals_store = [g for g in _goals_store if g['id'] != goal_id]
+
+    if len(_goals_store) < initial_len:
+        return jsonify({'success': True, 'message': 'Goal deleted'})
+    else:
+        return jsonify({'error': 'Goal not found'}), 404
+
+@app.route('/api/goals/<goal_id>/contribute', methods=['POST'])
+def contribute_to_goal(goal_id):
+    """Add a contribution to a savings goal"""
+    try:
+        data = request.get_json()
+        if not data or 'amount' not in data:
+            return jsonify({'error': 'Missing amount'}), 400
+
+        amount = float(data['amount'])
+        goal = next((g for g in _goals_store if g['id'] == goal_id), None)
+
+        if not goal:
+            return jsonify({'error': 'Goal not found'}), 404
+
+        goal['current_savings'] += amount
+        goal['updated_at'] = datetime.utcnow().isoformat() + 'Z'
+
+        # Calculate progress
+        progress = (goal['current_savings'] / goal['target_amount']) * 100 if goal['target_amount'] > 0 else 0
+
+        return jsonify({
+            'success': True,
+            'goal': goal,
+            'progress': round(progress, 1)
+        })
+
+    except ValueError as e:
+        return jsonify({'error': f'Invalid amount: {str(e)}'}), 400
+    except Exception as e:
+        logger.error(f"Error adding contribution: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/analyze-bill', methods=['POST'])
+def analyze_bill():
+    """Analyze uploaded bill/receipt (basic text extraction)"""
+    try:
+        # This is a simplified version - full OCR would require more setup
+        data = request.get_json()
+        if not data or 'items' not in data:
+            return jsonify({'error': 'Missing items array'}), 400
+
+        items = data['items']
+        if not isinstance(items, list):
+            return jsonify({'error': 'Items must be an array'}), 400
+
+        # Simple analysis
+        total = sum(item.get('price', 0) for item in items)
+        category_totals = {}
+        for item in items:
+            cat = item.get('category', 'other').lower()
+            category_totals[cat] = category_totals.get(cat, 0) + item.get('price', 0)
+
+        # Compare to SSB averages if possible
+        insights = []
+        for cat, amount in category_totals.items():
+            insights.append(f"{cat.title()}: {amount:,.0f} NOK")
+
+        return jsonify({
+            'success': True,
+            'analysis': {
+                'total': round(total, 2),
+                'item_count': len(items),
+                'category_breakdown': category_totals,
+                'insights': insights
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"Error analyzing bill: {e}", exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/landing_context', methods=['GET'])
+def get_landing_context():
+    """Get data for landing page widgets"""
+    try:
+        # Could include: recent market trends, featured articles, etc.
+        # For now return SSB highlights
+        data = ssb_api.get_household_budget_data(year='2022', nowcast=True)
+        parsed = ssb_api.parse_household_data(data)
+
+        highlights = {}
+        for item in parsed:
+            cat = item['category_code']
+            if cat in ['04', '01', '07']:  # Housing, Food, Transport
+                highlights[item['category'].lower().split()[0]] = round(item['value'] / 12, 0)
+
+        return jsonify({
+            'success': True,
+            'highlights': {
+                'housing': highlights.get('housing', 0),
+                'food': highlights.get('food', 0),
+                'transport': highlights.get('transport', 0)
+            },
+            'updated': datetime.utcnow().isoformat() + 'Z'
+        })
+
+    except Exception as e:
+        logger.error(f"Error in landing_context: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/health')
 def health():

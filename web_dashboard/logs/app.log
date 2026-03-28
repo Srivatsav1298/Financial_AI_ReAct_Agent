@@ -109,3 +109,11 @@ OSError: [Errno 48] Address already in use
 2026-03-28 17:08:42,147 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-03-28 17:08:46,197 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-03-28 17:09:23,831 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:27:35,109 - __main__ - INFO - 📝 Processing: I earn 45000 NOK/month with housing 15000, food 8000, transport 6000, entertainment 3000, and other ... (lang=en)
+2026-03-28 17:27:37,079 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:27:53,887 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:28:19,167 - __main__ - INFO - ✅ Completed in 44.097s (B:14.564s, R:29.482s)
+2026-03-28 17:30:43,812 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:30:45,554 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:30:50,439 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:31:30,726 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
