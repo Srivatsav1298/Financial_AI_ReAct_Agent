@@ -1,119 +1,232 @@
-# Norfain | Agentic Financial Reasoning & Retail Intelligence
+# Financial AI ReAct Agent: Explainable Financial Reasoning with Norwegian Open Data
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![LangChain](https://img.shields.io/badge/LangChain-0.1.0-green.svg)](https://github.com/langchain-ai/langchain)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Conference Paper](https://img.shields.io/badge/Paper-AGI_Rank'or_2030-brightgreen)](https://github.com/Srivatsav1298/Financial_AI_ReAct_Agent)
 
-**Norfain** is an end-to-end financial intelligence platform that bridges the gap between raw economic data and actionable consumer insights. Developed as part of a research initiative at **NMBU, Norway**, it combines advanced **ReAct (Reasoning & Acting)** AI architectures with live Norwegian retail data.
+## Overview
 
----
+This repository presents a comparative study of AI agent architectures for Norwegian household financial guidance, evaluating **baseline** vs **ReAct** reasoning approaches. The project integrates with Statistics Norway (SSB) open data to provide transparent, evidence-based financial insights.
 
-## 🚀 Key Modules & Features
-
-### 🛒 **Matbørsen | Retail Intelligence**
-A market basket analysis engine designed to fight food inflation in Norway.
-- **Receipt Extraction:** Automated ingestion of unstructured grocery receipts via **Tesseract OCR**.
-- **Entity Resolution:** Fuzzy matching algorithms map messy receipt strings to standardized SKUs across **5+ major supermarket chains** (Kiwi, Rema 1000, Meny, etc.).
-- **Live Price Tracker:** Real-time comparison engine for thousands of grocery products.
-
-### 🧠 **Agentic Financial Advisor**
-A comparative study of AI reasoning methods for financial guidance.
-- **ReAct Agent:** An iterative "Thought → Action → Observation" loop that ensures explainability and grounding.
-- **Baseline Agent:** High-speed direct response module for simple data retrieval.
-- **SSB Integration:** All insights are strictly verified against **Statistics Norway (SSB)** Consumer Price Index (CPI) and household spending datasets.
-
-### 💰 **Wealth & Savings Tracker**
-- **Inflation-Adjusted Goals:** Automatically adjusts your savings targets based on live Norwegian inflation indices.
-- **Prisjakt Integration:** Curated price tracking for electronics and consumer goods.
-- **Seasonal Year-Wheel (Årshjul):** Strategic financial planning based on Norwegian fiscal cycles (Halv Skatt, Feriepenger, Skattemelding).
+> 📄 **Conference Paper**: *Agentic Financial Reasoning with Norwegian Open Data: A ReAct-Based Approach for Explainable Budget Analysis*
+> 🎓 **Institution**: NMBU, Norway
+> 👤 **Author**: Srivatsav Saravanan
+> 📧 **Contact**: srivatsav.saravanan@nmbu.no
 
 ---
 
-## 🛠️ Tech Stack
+## The Problem
 
-- **Frontend:** HTML5, **Tailwind CSS**, Vanilla JavaScript (ES6+), Chart.js (Data Visualization).
-- **Backend:** **Python (Flask)**, REST API Architecture.
-- **AI/ML:** **LangChain**, ReAct Reasoning Framework, Local LLMs (via Ollama).
-- **Data:** **SSB API** (JSON-stat2), yfinance, pyTesseract (OCR), FuzzyWuzzy.
+Financial AI tools often operate as "black boxes," making it difficult for users to understand how recommendations are generated. This lack of transparency undermines trust—a critical factor in financial decision-making.
 
-### Key Capabilities
-- Dual agent architecture (Baseline vs ReAct)
-- Full ReAct reasoning trace for transparency
-- 20-question evaluation (4 complexity categories)
-- Real-time grocery price comparison across multiple Norwegian retailers
-- Basket-level optimization to identify the cheapest store combinations
-- Price normalization (per kg / per unit) for accurate comparisons
-- Daily automated data updates with historical price tracking
-- Currency conversion with live exchange rates
-- Smart recommendations based on price gaps and availability
+## Our Solution
+
+We implement and evaluate two agent architectures:
+
+| Architecture | Approach | Reasoning |
+|---------------|----------|-----------|
+| **Baseline Agent** | Single-step prompting | Minimal explanation |
+| **ReAct Agent** | Thought → Action → Observation loops | Full reasoning trace |
+
+**Key Finding**: ReAct significantly improves explainability without sacrificing accuracy, making financial AI more trustworthy and transparent.
 
 ---
 
-## 🔬 Scientific Evaluation
+## Key Features
 
-The platform includes a rigorous evaluation framework comparing Baseline vs. ReAct reasoning across **50 complex financial tasks**.
-
-| Metric | Baseline | ReAct | Difference |
-|--------|----------|-------|------------|
-| Avg Response Time | 6.90s | 11.78s | +70.7% |
-| Tool Usage Rate | 85% | 100% | +15% |
-| Reasoning Visibility | 0 | 100% | +100% |
-
-**Key Finding:** While ReAct introduces a latency overhead, it provides **100% transparent reasoning traces**, which is critical for building user trust in "Black Box" financial applications.
+- ✅ Dual agent implementation (Baseline vs ReAct)
+- ✅ Integration with Statistics Norway (SSB) Household Budget Survey (Table 10235)
+- ✅ Complete reasoning trace visualization for transparency
+- ✅ Local LLM support via Ollama (Llama 3.2)
+- ✅ Comprehensive evaluation suite (20 questions across 4 complexity categories)
+- ✅ Fully reproducible experiments
+- ✅ GDPR-compliant (no personal data)
+- ✅ Real-time grocery price comparison across Norwegian retailers
+- ✅ Basket-level optimization for cheapest store combinations
+- ✅ Price normalization (per kg/unit) for fair comparisons
+- ✅ Automated daily data updates with historical tracking
+- ✅ Live currency conversion
+- ✅ Smart recommendations based on price gaps
 
 ---
 
-## 📂 Project Structure
+## Quick Start
+
+### Prerequisites
+
+- Python 3.13+
+- [Ollama](https://ollama.ai/) with Llama 3.2 model
+- [GitHub CLI](https://cli.github.com/) (optional, for repository operations)
+
+### Installation
 
 ```bash
-norfain/
-├── src/
-│   ├── agents/          # AI agents (baseline & ReAct)
-│   ├── tools/           # LangChain tools for SSB & Retail
-│   └── utils/           # SSB API wrapper & matching logic
-├── experiments/
-│   └── web_dashboard/   # Advanced Flask/Tailwind Dashboard (Full Product)
-├── web_dashboard/       # Simple Baseline Dashboard
-├── results/             # Evaluation & Benchmark reports
-└── paper/               # Research paper & documentation
+# Clone the repository
+git clone https://github.com/Srivatsav1298/Financial_AI_ReAct_Agent
+cd Financial_AI_ReAct_Agent
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Running the Agents
+
+```bash
+# Run baseline agent
+python src/agents/baseline_agent.py
+
+# Run ReAct agent (with reasoning trace)
+python src/agents/react_agent.py
+
+# Run evaluation suite
+python experiments/evaluate_agents.py
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+## Project Structure
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Srivatsav1298/Financial_AI_ReAct_Agentt.git
-   cd Financial_AI_ReAct_Agentt
-   ```
-
-2. **Setup virtual environment:**
-   ```bash
-   python -m venv nvenv
-   source nvenv/bin/python/activate  # On MacOS/Linux
-   pip install -r requirements.txt
-   ```
-
-3. **Run the Advanced Web Dashboard:**
-   ```bash
-   cd experiments/web_dashboard
-   python app.py
-   ```
-   Visit `http://localhost:5050` to interact with the platform.
-
----
-
-## 📄 Authorship & Acknowledgments
-
-- **Author:** Srivatsav Saravanan ([srivatsav.saravanan@nmbu.no](mailto:srivatsav.saravanan@nmbu.no))
-- **Institution:** Norwegian University of Life Sciences (NMBU)
-- **Data Source:** Statistics Norway (SSB)
-- **Tools:** Special thanks to the teams behind LangChain, Ollama, and Tailwind CSS.
+```
+Financial_AI_ReAct_Agent/
+├── src/
+│   ├── agents/              # AI agent implementations
+│   │   ├── baseline_agent.py
+│   │   └── react_agent.py
+│   ├── tools/               # LangChain tools for SSB API
+│   │   └── ssb_tools.py
+│   ├── utils/               # SSB API wrapper & caching
+│   │   └── ssb_client.py
+│   └── evaluation/          # Evaluation framework
+│       └── evaluator.py
+├── data/                    # Cached SSB data
+├── experiments/             # Experiment scripts
+├── results/                 # Evaluation outputs & traces
+├── tests/                   # Unit & integration tests
+├── docs/                    # Documentation
+├── notebooks/               # Analysis notebooks
+└── readme.md                # This file
+```
 
 ---
 
-## 📜 License
+## Experimental Results
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+### Performance Comparison (20 Questions)
+
+| Metric | Baseline | ReAct | Δ |
+|--------|----------|-------|---|
+| **Avg Response Time** | 6.90s | 11.78s | +70.7% |
+| **Tool Usage Rate** | 85% | 100% | +15% |
+| **Avg Iterations** | N/A | 1.9 | — |
+| **Reasoning Visibility** | 0 | 0.8 | — |
+| **Error Rate** | 0% | 0% | — |
+
+### Key Insights
+
+- ✅ **ReAct provides full grounding**: 100% tool usage vs 85% for Baseline
+- ✅ **Transparency**: ReAct generates explicit reasoning traces (avg 0.8 visibility score)
+- ⚠️ **Speed trade-off**: ReAct is ~70% slower but still performant (<12s)
+- ✅ **Adaptability**: ReAct adjusts reasoning depth based on question complexity
+- ✅ **Accuracy**: Both achieve 0% error rate on test set
+
+---
+
+## Robustness Evaluation (50 Tasks)
+
+An expanded evaluation covering complex scenarios including adversarial inputs, macroeconomic shocks, and multi-agent conflicts.
+
+### Performance Highlights
+
+| Task Type | ReAct Advantage | Baseline Limitation |
+|-----------|-----------------|---------------------|
+| **Diagnostic** | +60% (NT30) | Failed "Chronic Undersaving" |
+| **Persona** | +20% (NT48) | Poor adherence to complex instructions |
+| **Judgment** | +20% (NT2) | Nuanced lifestyle assessments |
+| **Shock Response** | +10% (NT22) | Unexpected event handling |
+
+**Conclusion**: ReAct excels in tasks requiring multi-step reasoning, persona adherence, and complex judgment, while Baseline remains efficient for simple information retrieval.
+
+---
+
+## Technology Stack
+
+- **LLM Backend**: Ollama (Llama 3.2)
+- **Framework**: LangChain
+- **Data Source**: Statistics Norway (SSB) JSON-stat2 API
+- **Language**: Python 3.13+
+- **Caching**: Local JSON cache with TTL
+- **Testing**: pytest
+
+---
+
+## Why ReAct for Financial AI?
+
+1. **Transparency**: Users see the reasoning process, not just answers
+2. **Trust**: Each recommendation is grounded in verified SSB data
+3. **Explainability**: Full audit trail for regulatory compliance
+4. **Adaptability**: Handles simple queries and complex multi-step analysis
+5. **Robustness**: Better performance on edge cases and adversarial inputs
+
+---
+
+## Contributing
+
+We welcome contributions! Please feel free to:
+
+- 🐛 Report issues
+- 🔧 Submit pull requests
+- 📝 Suggest improvements to the evaluation framework
+- 🧪 Add new test cases
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines.
+
+---
+
+## Future Work
+
+- [x] Complete 50-task robustness evaluation
+- [ ] User study in Norway (planning phase)
+- [ ] Real-time SSB API integration (prototype)
+- [ ] Multi-language support (Norwegian Bokmål/Nynorsk)
+- [ ] Web interface for non-technical users
+- [ ] Integration with personal banking data (with user consent)
+
+---
+
+## Acknowledgments
+
+- **Statistics Norway (SSB)** for open data access
+- **Ollama** for local LLM infrastructure
+- **LangChain** for agent framework
+- **NMBU** for research support
+
+---
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+## Citation
+
+If you use this work in your research, please cite:
+
+```bibtex
+@inproceedings{saravanan2025react,
+  title={Agentic Financial Reasoning with Norwegian Open Data: A ReAct-Based Approach for Explainable Budget Analysis},
+  author={Saravanan, Srivatsav},
+  booktitle={AGI Rank'or 2030 Conference},
+  year={2025},
+  institution={NMBU, Norway}
+}
+```
+
+---
+
+## Contact
+
+**Srivatsav Saravanan**
+📧 srivatsav.saravanan@nmbu.no
+🔗 [LinkedIn](https://linkedin.com/in/srivatsav) | [GitHub](https://github.com/Srivatsav1298)
