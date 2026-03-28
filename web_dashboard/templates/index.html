@@ -5,394 +5,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Norfain ReAct Agent - Interactive Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <meta name="description" content="Interactive dashboard comparing Baseline vs ReAct reasoning for Norwegian household budget analysis using SSB data.">
+    <meta name="robots" content="noindex, nofollow">
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+    <!-- Preload critical resources -->
+    <link rel="preload" href="{{ url_for('static', filename='css/styles.css') }}" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
-        header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .language-switcher {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            display: flex;
-            gap: 5px;
-            background: #f0f0f0;
-            padding: 5px;
-            border-radius: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .lang-btn {
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #666;
-            background: transparent;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .lang-btn:hover {
-            color: #667eea;
-            transform: none;
-        }
-
-        .lang-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-        }
-
-        h1 {
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 1.1em;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .question-panel {
-            grid-column: 1 / -1;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 15px 20px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            padding: 15px 40px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .example-questions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .example-btn {
-            padding: 8px 15px;
-            font-size: 14px;
-            background: #f0f0f0;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .example-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .agent-panel {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .baseline-panel {
-            border-top: 5px solid #3498db;
-        }
-
-        .react-panel {
-            border-top: 5px solid #e74c3c;
-        }
-
-        .agent-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .agent-title {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        .baseline-title {
-            color: #3498db;
-        }
-
-        .react-title {
-            color: #e74c3c;
-        }
-
-        .time-badge {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .baseline-badge {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .react-badge {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .response-area {
-            min-height: 200px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 15px;
-            line-height: 1.6;
-        }
-
-        .reasoning-trace {
-            margin-top: 20px;
-            padding: 15px;
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            border-radius: 5px;
-        }
-
-        .reasoning-step {
-            margin: 10px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-        }
-
-        .step-label {
-            font-weight: bold;
-            color: #e74c3c;
-            display: inline-block;
-            min-width: 120px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .stats-panel {
-            grid-column: 1 / -1;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-            margin: 10px 0;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .comparison-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            margin-top: 10px;
-            background: #d1ecf1;
-            color: #0c5460;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-
-        .error-message {
-            padding: 15px;
-            background: #f8d7da;
-            color: #721c24;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-    </style>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 </head>
 
 <body>
-    <div class="container">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <div class="container" id="main" role="main">
         <header>
-            <div class="language-switcher">
-                <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
-                <button class="lang-btn" onclick="switchLanguage('no')" id="lang-no">NO</button>
+            <div class="language-switcher" role="group" aria-label="Language selection">
+                <button class="lang-btn" onclick="APP.setLanguage('en')" id="lang-en" aria-pressed="true">EN</button>
+                <button class="lang-btn" onclick="APP.setLanguage('no')" id="lang-no" aria-pressed="false">NO</button>
             </div>
             <h1>🚀 Norfain ReAct Agent</h1>
             <p class="subtitle" data-translate="subtitle">Interactive Demo: Baseline vs ReAct Reasoning</p>
         </header>
 
-        <div class="question-panel">
-            <h2 style="margin-bottom: 15px;" data-translate="askQuestion">💬 Ask a Question</h2>
+        <section class="question-panel" aria-labelledby="question-heading">
+            <h2 id="question-heading" style="margin-bottom: 15px;" data-translate="askQuestion">💬 Ask a Question</h2>
+
             <div class="input-group">
-                <input type="text" id="questionInput" data-translate-placeholder="inputPlaceholder"
-                    placeholder="e.g., How much do Norwegian families spend on housing?"
-                    onkeypress="if(event.key==='Enter') askQuestion()">
-                <button onclick="askQuestion()" id="askBtn" data-translate="askBothAgents">Ask Both Agents</button>
+                <input type="text"
+                       id="questionInput"
+                       data-translate-placeholder="inputPlaceholder"
+                       placeholder="e.g., How much do Norwegian families spend on housing?"
+                       maxlength="1000"
+                       aria-required="true"
+                       aria-describedby="input-help"
+                       autocomplete="off"
+                       spellcheck="true">
+                <button onclick="APP.handleAskQuestion()"
+                        id="askBtn"
+                        data-translate="askBothAgents"
+                        type="button">
+                    Ask Both Agents
+                </button>
             </div>
+
+            <p id="input-help" class="help-text" style="color: var(--gray-600); font-size: 0.875rem; margin-top: var(--spacing-sm);">
+                Press Enter to submit • Max 1000 characters • Questions are cached for faster responses
+            </p>
+
             <div class="example-questions">
                 <strong data-translate="examples">Examples:</strong>
                 <br><br>
                 <div style="margin-bottom: 10px;"><strong>📊 Simple Questions:</strong></div>
-                <button class="example-btn" onclick="useExample(this)" data-translate="example1">How much do Norwegian
-                    families spend on
-                    housing?</button>
-                <button class="example-btn" onclick="useExample(this)" data-translate="example2">Do Norwegians spend
-                    more on housing or
-                    food?</button>
+                <button class="example-btn" onclick="APP.useExample(this)" data-translate="example1">
+                    How much do Norwegian families spend on housing?
+                </button>
+                <button class="example-btn" onclick="APP.useExample(this)" data-translate="example2">
+                    Do Norwegians spend more on housing or food?
+                </button>
 
                 <br><br>
                 <div style="margin-bottom: 10px;"><strong>🧠 Complex Scenarios (ReAct Excels Here):</strong></div>
-                <button class="example-btn" onclick="useExample(this)">I earn 45,000 NOK/month and spend 15,000 on
-                    housing, 8,000 on food, 6,000 on transport, 3,000 on entertainment. I want to save 10,000/month.
-                    What should I change?</button>
-                <button class="example-btn" onclick="useExample(this)">I earn 55,000 NOK/month with expenses: housing
-                    18,000, food 7,000, transport 5,000, entertainment 3,000, other 4,000. Am I financially
-                    healthy?</button>
-                <button class="example-btn" onclick="useExample(this)">I want to buy a 300,000 NOK car. I earn
-                    50,000/month, have 100,000 saved, expenses are 35,000/month. Should I buy now or save
-                    longer?</button>
-                <button class="example-btn" onclick="useExample(this)">I earn 60,000 NOK/month and spend 16,000 on
-                    housing, 9,000 on food, 7,000 on transport, 5,000 on entertainment. How much could I realistically
-                    save if I optimize my budget?</button>
+                <button class="example-btn" onclick="APP.useExample(this)">
+                    I earn 45,000 NOK/month and spend 15,000 on housing, 8,000 on food, 6,000 on transport, 3,000 on entertainment. I want to save 10,000/month. What should I change?
+                </button>
+                <button class="example-btn" onclick="APP.useExample(this)">
+                    I earn 55,000 NOK/month with expenses: housing 18,000, food 7,000, transport 5,000, entertainment 3,000, other 4,000. Am I financially healthy?
+                </button>
+                <button class="example-btn" onclick="APP.useExample(this)">
+                    I want to buy a 300,000 NOK car. I earn 50,000/month, have 100,000 saved, expenses are 35,000/month. Should I buy now or save longer?
+                </button>
+                <button class="example-btn" onclick="APP.useExample(this)">
+                    I earn 60,000 NOK/month and spend 16,000 on housing, 9,000 on food, 7,000 on transport, 5,000 on entertainment. How much could I realistically save if I optimize my budget?
+                </button>
             </div>
-        </div>
+        </section>
 
         <div class="main-content">
-            <div class="agent-panel baseline-panel">
+            <div class="agent-panel baseline-panel" aria-labelledby="baseline-heading">
                 <div class="agent-header">
-                    <span class="agent-title baseline-title" data-translate="baselineAgent">🤖 Baseline Agent</span>
+                    <span class="agent-title baseline-title" id="baseline-heading" data-translate="baselineAgent">🤖 Baseline Agent</span>
                     <span class="time-badge baseline-badge" id="baselineTime">--</span>
                 </div>
-                <div><strong data-translate="type">Type:</strong> <span data-translate="baselineType">Direct prompting,
-                        single-step</span></div>
-                <div class="response-area" id="baselineResponse">
+                <div><strong data-translate="type">Type:</strong> <span data-translate="baselineType">Direct prompting, single-step</span></div>
+                <div class="response-area" id="baselineResponse" role="region" aria-live="polite">
                     <em style="color: #999;" data-translate="waitingForQuestion">Waiting for question...</em>
                 </div>
             </div>
 
-            <div class="agent-panel react-panel">
+            <div class="agent-panel react-panel" aria-labelledby="react-heading">
                 <div class="agent-header">
-                    <span class="agent-title react-title" data-translate="reactAgent">🧠 ReAct Agent</span>
+                    <span class="agent-title react-title" id="react-heading" data-translate="reactAgent">🧠 ReAct Agent</span>
                     <span class="time-badge react-badge" id="reactTime">--</span>
                 </div>
-                <div><strong data-translate="type">Type:</strong> <span data-translate="reactType">Multi-step reasoning
-                        with traces</span></div>
-                <div class="response-area" id="reactResponse">
+                <div><strong data-translate="type">Type:</strong> <span data-translate="reactType">Multi-step reasoning with traces</span></div>
+                <div class="response-area" id="reactResponse" role="region" aria-live="polite">
                     <em style="color: #999;" data-translate="waitingForQuestion">Waiting for question...</em>
                 </div>
-                <div id="reasoningTrace"></div>
+                <div id="reasoningTrace" aria-live="polite"></div>
             </div>
         </div>
 
-        <div class="stats-panel" id="statsPanel" style="display: none;">
+        <section class="stats-panel" id="statsPanel" style="display: none;" aria-labelledby="stats-heading">
+            <h2 id="stats-heading" class="sr-only" style="display:none;">Performance Statistics</h2>
             <div class="stat-card">
                 <div class="stat-label" data-translate="timeDifference">Time Difference</div>
                 <div class="stat-value" id="timeDiff">--</div>
@@ -410,226 +132,11 @@
                 <div class="stat-label" data-translate="reactToolUsage">ReAct Tool Usage</div>
                 <div class="stat-value" id="reactTool">100%</div>
             </div>
-        </div>
+        </section>
     </div>
 
-    <script>
-        // Translation dictionary
-        const translations = {
-            en: {
-                subtitle: "Interactive Demo: Baseline vs ReAct Reasoning",
-                askQuestion: "💬 Ask a Question",
-                inputPlaceholder: "e.g., How much do Norwegian families spend on housing?",
-                askBothAgents: "Ask Both Agents",
-                examples: "Examples:",
-                example1: "How much do Norwegian families spend on housing?",
-                example2: "Do Norwegians spend more on housing or food?",
-                example3: "What's the ratio of housing to food costs?",
-                example4: "What's a realistic monthly budget in Norway?",
-                baselineAgent: "🤖 Baseline Agent",
-                reactAgent: "🧠 ReAct Agent",
-                type: "Type:",
-                baselineType: "Direct prompting, single-step",
-                reactType: "Multi-step reasoning with traces",
-                waitingForQuestion: "Waiting for question...",
-                timeDifference: "Time Difference",
-                reactIterations: "ReAct Iterations",
-                baselineToolUsage: "Baseline Tool Usage",
-                reactToolUsage: "ReAct Tool Usage",
-                processing: "Processing...",
-                processingQuestion: "Processing question...",
-                processingReasoning: "Processing question with reasoning...",
-                reasoningTrace: "🔍 Reasoning Trace:",
-                iteration: "Iteration",
-                thought: "THOUGHT:",
-                action: "ACTION:",
-                observation: "OBSERVATION:",
-                ofBaselineTime: "of baseline time"
-            },
-            no: {
-                subtitle: "Interaktiv Demo: Baseline vs ReAct Resonnering",
-                askQuestion: "💬 Still et Spørsmål",
-                inputPlaceholder: "f.eks., Hvor mye bruker norske familier på bolig?",
-                askBothAgents: "Spør Begge Agenter",
-                examples: "Eksempler:",
-                example1: "Hvor mye bruker norske familier på bolig?",
-                example2: "Bruker nordmenn mer på bolig eller mat?",
-                example3: "Hva er forholdet mellom bolig- og matkostnader?",
-                example4: "Hva er et realistisk månedlig budsjett i Norge?",
-                baselineAgent: "🤖 Baseline Agent",
-                reactAgent: "🧠 ReAct Agent",
-                type: "Type:",
-                baselineType: "Direkte prompting, enkelt-trinn",
-                reactType: "Flertrinnresonnering med spor",
-                waitingForQuestion: "Venter på spørsmål...",
-                timeDifference: "Tidsforskjell",
-                reactIterations: "ReAct Iterasjoner",
-                baselineToolUsage: "Baseline Verktøybruk",
-                reactToolUsage: "ReAct Verktøybruk",
-                processing: "Behandler...",
-                processingQuestion: "Behandler spørsmål...",
-                processingReasoning: "Behandler spørsmål med resonnering...",
-                reasoningTrace: "🔍 Resonnering Spor:",
-                iteration: "Iterasjon",
-                thought: "TANKE:",
-                action: "HANDLING:",
-                observation: "OBSERVASJON:",
-                ofBaselineTime: "av baseline tid"
-            }
-        };
-
-        // Current language (default: English)
-        let currentLanguage = localStorage.getItem('language') || 'en';
-
-        // Switch language function
-        function switchLanguage(lang) {
-            currentLanguage = lang;
-            localStorage.setItem('language', lang);
-
-            // Update button states
-            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-            document.getElementById('lang-no').classList.toggle('active', lang === 'no');
-
-            // Update all translatable elements
-            updateTranslations();
-        }
-
-        // Update all translations
-        function updateTranslations() {
-            const lang = translations[currentLanguage];
-
-            // Update text content
-            document.querySelectorAll('[data-translate]').forEach(element => {
-                const key = element.getAttribute('data-translate');
-                if (lang[key]) {
-                    element.textContent = lang[key];
-                }
-            });
-
-            // Update placeholders
-            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
-                const key = element.getAttribute('data-translate-placeholder');
-                if (lang[key]) {
-                    element.placeholder = lang[key];
-                }
-            });
-        }
-
-        function useExample(button) {
-            document.getElementById('questionInput').value = button.textContent;
-        }
-
-        async function askQuestion() {
-            const question = document.getElementById('questionInput').value.trim();
-
-            if (!question) {
-                alert('Please enter a question');
-                return;
-            }
-
-            // Disable button and show loading
-            const btn = document.getElementById('askBtn');
-            btn.disabled = true;
-            btn.textContent = translations[currentLanguage].processing;
-
-            // Show loading in response areas
-            document.getElementById('baselineResponse').innerHTML = `<div class="loading"><div class="spinner"></div>${translations[currentLanguage].processingQuestion}</div>`;
-            document.getElementById('reactResponse').innerHTML = `<div class="loading"><div class="spinner"></div>${translations[currentLanguage].processingReasoning}</div>`;
-            document.getElementById('reasoningTrace').innerHTML = '';
-            document.getElementById('statsPanel').style.display = 'none';
-
-            try {
-                const response = await fetch('/api/ask', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        question: question,
-                        language: currentLanguage  // Send current language to backend
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to get response');
-                }
-
-                const data = await response.json();
-
-                // Display baseline response
-                document.getElementById('baselineResponse').innerHTML = `<p>${data.baseline.answer}</p>`;
-                document.getElementById('baselineTime').textContent = `${data.baseline.time.toFixed(2)}s`;
-
-                // Display ReAct response
-                document.getElementById('reactResponse').innerHTML = `<p>${data.react.answer}</p>`;
-                document.getElementById('reactTime').textContent = `${data.react.time.toFixed(2)}s`;
-
-                // Display reasoning trace
-                if (data.react.reasoning_steps && data.react.reasoning_steps.length > 0) {
-                    let traceHTML = `<div class="reasoning-trace"><h3>${translations[currentLanguage].reasoningTrace}</h3>`;
-
-                    data.react.reasoning_steps.forEach((step, idx) => {
-                        if (step.action) {
-                            traceHTML += `
-                                <div class="reasoning-step">
-                                    <div><span class="step-label">${translations[currentLanguage].iteration} ${step.iteration}:</span></div>
-                                    <div><span class="step-label">${translations[currentLanguage].thought}</span> ${step.thought.substring(0, 150)}...</div>
-                                    <div><span class="step-label">${translations[currentLanguage].action}</span> ${step.action}</div>
-                                    <div><span class="step-label">${translations[currentLanguage].observation}</span> ${step.observation.substring(0, 100)}...</div>
-                                </div>
-                            `;
-                        }
-                    });
-
-                    traceHTML += '</div>';
-                    document.getElementById('reasoningTrace').innerHTML = traceHTML;
-                }
-
-                // Show statistics
-                document.getElementById('statsPanel').style.display = 'grid';
-                document.getElementById('timeDiff').textContent = `+${data.comparison.time_difference.toFixed(2)}s`;
-                document.getElementById('timeComparison').textContent = `${(data.comparison.time_ratio * 100).toFixed(0)}% ${translations[currentLanguage].ofBaselineTime}`;
-                document.getElementById('iterations').textContent = data.react.iterations || 'N/A';
-                document.getElementById('baselineTool').textContent = data.baseline.tool_used ? '✓ Yes' : '✗ No';
-
-            } catch (error) {
-                console.error('Error:', error);
-                
-                // Friendly error message map
-                let displayError = error.message;
-                if (error.message === 'Failed to get response') {
-                    displayError = 'Server failed to respond. Please check if the backend is running.';
-                }
-                
-                const errorHtml = `
-                    <div class="error-message">
-                        <strong>⚠️ Error:</strong> ${displayError}
-                        <br><br>
-                        <small>Check the server logs for more details.</small>
-                    </div>`;
-                    
-                document.getElementById('baselineResponse').innerHTML = errorHtml;
-                document.getElementById('reactResponse').innerHTML = errorHtml;
-            } finally {
-                btn.disabled = false;
-                btn.textContent = translations[currentLanguage].askBothAgents;
-            }
-        }
-
-        // Check server health on load
-        window.addEventListener('load', async () => {
-            // Initialize language on page load
-            switchLanguage(currentLanguage);
-
-            try {
-                const response = await fetch('/health');
-                const data = await response.json();
-                console.log('✅ Server health:', data);
-            } catch (error) {
-                console.error('❌ Server connection failed:', error);
-            }
-        });
-    </script>
+    <!-- Load JavaScript at end for better performance -->
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </body>
 
 </html>

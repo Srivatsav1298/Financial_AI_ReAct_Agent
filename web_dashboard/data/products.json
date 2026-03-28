@@ -1,0 +1,692 @@
+[
+  [
+    "Dairy",
+    "Lettmelk 1L (Tine)",
+    21.9
+  ],
+  [
+    "Dairy",
+    "Helmelk 1L (Tine)",
+    24.9
+  ],
+  [
+    "Dairy",
+    "Brunost (G-35 500g)",
+    64.9
+  ],
+  [
+    "Dairy",
+    "Norvegia Ost 1kg",
+    129.0
+  ],
+  [
+    "Dairy",
+    "Jarlsberg Ost 700g",
+    105.0
+  ],
+  [
+    "Dairy",
+    "Smør (Tine Meierismør)",
+    52.9
+  ],
+  [
+    "Dairy",
+    "Margarin (Soft Flora)",
+    32.5
+  ],
+  [
+    "Dairy",
+    "Skyr",
+    19.9
+  ],
+  [
+    "Dairy",
+    "Yoghurt (Frukt 150g)",
+    12.9
+  ],
+  [
+    "Dairy",
+    "Yoghurt Drikke (GoMorgen)",
+    18.9
+  ],
+  [
+    "Dairy",
+    "Egg (12pk Frittgående)",
+    42.9
+  ],
+  [
+    "Dairy",
+    "Kulturmelk 1L",
+    22.5
+  ],
+  [
+    "Dairy",
+    "Seterrømme 3dl",
+    24.9
+  ],
+  [
+    "Dairy",
+    "Cottage Cheese 400g",
+    36.9
+  ],
+  [
+    "Dairy",
+    "Fløte 3dl",
+    24.5
+  ],
+  [
+    "Dairy",
+    "Crème Fraîche",
+    26.9
+  ],
+  [
+    "Dairy",
+    "Havremelk (Oatly)",
+    22.9
+  ],
+  [
+    "Dairy",
+    "Revet Ost 200g",
+    34.9
+  ],
+  [
+    "Dairy",
+    "Tubeost (Skinkeost)",
+    31.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Grovbrød",
+    36.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Kneippbrød",
+    14.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Knekkebrød (Wasa)",
+    24.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Lomper (10pk)",
+    18.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Flatbrød",
+    29.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Polarbrød",
+    32.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Havregryn 1kg",
+    21.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Cornflakes (Kelloggs)",
+    34.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Musli (Frukt & Nøtter)",
+    44.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Granola (Bare Bra)",
+    59.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Blåbærsyltetøy",
+    34.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Peanøttsmør (Green Choice)",
+    49.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Honning",
+    54.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Pasta (Spaghetti 1kg)",
+    28.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Ris (Jasmin 1kg)",
+    39.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Risengrynsgrøt (Ferdig)",
+    49.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Hvetemel 2kg",
+    24.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Sukker 1kg",
+    26.5
+  ],
+  [
+    "Breakfast & Bakery",
+    "Rundstykker (Frossen)",
+    29.9
+  ],
+  [
+    "Breakfast & Bakery",
+    "Lefse (Vestlands)",
+    42.5
+  ],
+  [
+    "Meat & Fish",
+    "Laksefilet 500g",
+    119.0
+  ],
+  [
+    "Meat & Fish",
+    "Torskefilet 400g",
+    99.0
+  ],
+  [
+    "Meat & Fish",
+    "Seifilet (Frossen)",
+    65.0
+  ],
+  [
+    "Meat & Fish",
+    "Fiskekaker (Hjerte)",
+    54.9
+  ],
+  [
+    "Meat & Fish",
+    "Makrell i Tomat",
+    21.5
+  ],
+  [
+    "Meat & Fish",
+    "Kaviar (Mills)",
+    32.9
+  ],
+  [
+    "Meat & Fish",
+    "Leverpostei",
+    24.5
+  ],
+  [
+    "Meat & Fish",
+    "Kjøttdeig 400g",
+    59.9
+  ],
+  [
+    "Meat & Fish",
+    "Kyllingfilet 1kg",
+    149.0
+  ],
+  [
+    "Meat & Fish",
+    "Bacon 140g",
+    36.9
+  ],
+  [
+    "Meat & Fish",
+    "Grillpølser (Gilde)",
+    49.9
+  ],
+  [
+    "Meat & Fish",
+    "Kjøttkaker (Middag)",
+    69.9
+  ],
+  [
+    "Meat & Fish",
+    "Kokt Skinke",
+    34.5
+  ],
+  [
+    "Meat & Fish",
+    "Pizza Grandiosa",
+    54.9
+  ],
+  [
+    "Meat & Fish",
+    "Fiskepinner",
+    39.9
+  ],
+  [
+    "Meat & Fish",
+    "Fenalår (Skivet)",
+    89.0
+  ],
+  [
+    "Fruits & Veg",
+    "Poteter 1kg",
+    19.9
+  ],
+  [
+    "Fruits & Veg",
+    "Gulrøtter 1kg",
+    18.9
+  ],
+  [
+    "Fruits & Veg",
+    "Agurk",
+    22.9
+  ],
+  [
+    "Fruits & Veg",
+    "Tomater 500g",
+    34.9
+  ],
+  [
+    "Fruits & Veg",
+    "Løk 1kg",
+    16.5
+  ],
+  [
+    "Fruits & Veg",
+    "Brokkoli",
+    24.9
+  ],
+  [
+    "Fruits & Veg",
+    "Blomkål",
+    29.9
+  ],
+  [
+    "Fruits & Veg",
+    "Paprika (Mix)",
+    39.9
+  ],
+  [
+    "Fruits & Veg",
+    "Epler (Norske) 1kg",
+    39.9
+  ],
+  [
+    "Fruits & Veg",
+    "Bananer 1kg",
+    21.9
+  ],
+  [
+    "Fruits & Veg",
+    "Druer 500g",
+    39.9
+  ],
+  [
+    "Fruits & Veg",
+    "Pærer 1kg",
+    34.9
+  ],
+  [
+    "Fruits & Veg",
+    "Appelsiner 1kg",
+    29.9
+  ],
+  [
+    "Fruits & Veg",
+    "Sitroner (Nett)",
+    24.9
+  ],
+  [
+    "Fruits & Veg",
+    "Blåbær 125g",
+    29.9
+  ],
+  [
+    "Fruits & Veg",
+    "Avokado (2pk)",
+    34.9
+  ],
+  [
+    "Fruits & Veg",
+    "Urte (Basilikum)",
+    24.9
+  ],
+  [
+    "Pantry",
+    "Kaffe (Evergood 250g)",
+    42.9
+  ],
+  [
+    "Pantry",
+    "Te (Twinings)",
+    34.5
+  ],
+  [
+    "Pantry",
+    "Rapsolje 1L",
+    49.9
+  ],
+  [
+    "Pantry",
+    "Olivenolje 500ml",
+    89.9
+  ],
+  [
+    "Pantry",
+    "Solsikkeolje 1L",
+    39.9
+  ],
+  [
+    "Pantry",
+    "Ketchup (Idun)",
+    36.9
+  ],
+  [
+    "Pantry",
+    "Sennep",
+    22.9
+  ],
+  [
+    "Pantry",
+    "Majones (Mills)",
+    36.9
+  ],
+  [
+    "Pantry",
+    "Brun Saus (Toro)",
+    18.9
+  ],
+  [
+    "Pantry",
+    "Kokosmelk",
+    16.5
+  ],
+  [
+    "Pantry",
+    "Gastromat",
+    29.9
+  ],
+  [
+    "Pantry",
+    "Salt",
+    19.9
+  ],
+  [
+    "Pantry",
+    "Pepper",
+    24.9
+  ],
+  [
+    "Tex-Mex",
+    "Tortillas",
+    26.9
+  ],
+  [
+    "Tex-Mex",
+    "Taco Skjell 12pk",
+    24.9
+  ],
+  [
+    "Tex-Mex",
+    "Taco Krydder",
+    14.5
+  ],
+  [
+    "Tex-Mex",
+    "Taco Salsa",
+    28.9
+  ],
+  [
+    "Tex-Mex",
+    "Guacamole Dip",
+    34.9
+  ],
+  [
+    "Tex-Mex",
+    "Nacho Chips",
+    22.9
+  ],
+  [
+    "Tex-Mex",
+    "Refried Beans (Bønner)",
+    24.5
+  ],
+  [
+    "Tex-Mex",
+    "Jalapenos",
+    19.9
+  ],
+  [
+    "Treats & Desserts",
+    "Freia Melkesjokolade 200g",
+    44.9
+  ],
+  [
+    "Treats & Desserts",
+    "Kvikk Lunsj 3pk",
+    42.9
+  ],
+  [
+    "Treats & Desserts",
+    "Stratos (King Size)",
+    44.9
+  ],
+  [
+    "Treats & Desserts",
+    "Troika",
+    18.9
+  ],
+  [
+    "Treats & Desserts",
+    "Firkløver 200g",
+    44.9
+  ],
+  [
+    "Treats & Desserts",
+    "Walters Mandler 200g",
+    46.9
+  ],
+  [
+    "Treats & Desserts",
+    "Hobby Sjokolade",
+    16.9
+  ],
+  [
+    "Treats & Desserts",
+    "Cuba Sjokolade",
+    16.9
+  ],
+  [
+    "Treats & Desserts",
+    "Smash! Pose 200g",
+    46.9
+  ],
+  [
+    "Treats & Desserts",
+    "Potetgull (Sørlands)",
+    28.9
+  ],
+  [
+    "Treats & Desserts",
+    "Smågodt 1kg",
+    149.0
+  ],
+  [
+    "Treats & Desserts",
+    "Seigmenn (Laban)",
+    34.5
+  ],
+  [
+    "Treats & Desserts",
+    "Is (Tress 2L)",
+    59.9
+  ],
+  [
+    "Treats & Desserts",
+    "Sandwich Is 6pk",
+    64.9
+  ],
+  [
+    "Treats & Desserts",
+    "Daim Kake (Frossen)",
+    89.9
+  ],
+  [
+    "Treats & Desserts",
+    "NonStop Pose",
+    42.5
+  ],
+  [
+    "Treats & Desserts",
+    "Ballerina Kjeks",
+    26.9
+  ],
+  [
+    "Treats & Desserts",
+    "Saltstenger (Soletti)",
+    22.9
+  ],
+  [
+    "Drinks",
+    "Solo 1.5L",
+    26.9
+  ],
+  [
+    "Drinks",
+    "Farris 1.5L",
+    21.9
+  ],
+  [
+    "Drinks",
+    "Saft (Lerum)",
+    39.9
+  ],
+  [
+    "Drinks",
+    "Appelsinjuice 1L",
+    32.9
+  ],
+  [
+    "Drinks",
+    "Eplejuice 1L",
+    28.9
+  ],
+  [
+    "Drinks",
+    "Coca Cola 1.5L",
+    29.9
+  ],
+  [
+    "Household",
+    "Toalettpapir (8pk)",
+    64.9
+  ],
+  [
+    "Household",
+    "Tørkerull (Tørk)",
+    49.9
+  ],
+  [
+    "Household",
+    "Avfallsposer",
+    24.5
+  ],
+  [
+    "Household",
+    "Vaskepulver OMO",
+    89.0
+  ],
+  [
+    "Household",
+    "Zalo Oppvask",
+    34.5
+  ],
+  [
+    "Household",
+    "Oppvasktabletter (Sun)",
+    99.0
+  ],
+  [
+    "Household",
+    "Jif Universal",
+    44.9
+  ],
+  [
+    "Household",
+    "Håndsåpe (Lano)",
+    22.9
+  ],
+  [
+    "Household",
+    "Aluminiumsfolie",
+    29.9
+  ],
+  [
+    "Seasonal",
+    "Ribbe (Frossen pr kg)",
+    89.9
+  ],
+  [
+    "Seasonal",
+    "Pinnekjøtt (pr kg)",
+    249.0
+  ],
+  [
+    "Seasonal",
+    "Lutefisk (pr kg)",
+    129.0
+  ],
+  [
+    "Seasonal",
+    "Fastelavnsboller (4pk)",
+    54.9
+  ],
+  [
+    "Pantry",
+    "Pizzamel 1kg (Regal)",
+    34.9
+  ],
+  [
+    "Pantry",
+    "Pizzatopping 150ml (Eldorado)",
+    29.5
+  ],
+  [
+    "Pantry",
+    "Pizzasaus Hvit 28g (Toro)",
+    22.9
+  ],
+  [
+    "Pantry",
+    "Bombay Curry 360g (Saritas)",
+    64.5
+  ],
+  [
+    "Pantry",
+    "Tandoori Saus 360g (Saritas)",
+    64.5
+  ],
+  [
+    "Pantry",
+    "Natreen Tabletter 500stk",
+    49.9
+  ],
+  [
+    "Meat & Fish",
+    "Kylling Overlår 650g (Prior)",
+    89.9
+  ],
+  [
+    "Pantry",
+    "Rosiner 6x42g (Eldorado)",
+    36.9
+  ]
+]

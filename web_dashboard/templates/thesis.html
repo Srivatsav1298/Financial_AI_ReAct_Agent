@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master's Thesis | Norfain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'] },
+                    colors: { brand: { dark: '#0f172a', primary: '#10b981' } },
+                    animation: { 'bounce-slow': 'bounce 3s infinite', 'pulse-gentle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col pb-32">
+
+    <!-- Navbar -->
+    <nav class="w-full relative z-50 border-b border-white/10 bg-slate-900/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="cursor-pointer" onclick="window.location.href='/'">
+                    <span
+                        class="text-2xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-500">Norfain</span>
+                </div>
+                <div class="hidden md:flex space-x-6 text-sm font-medium items-center">
+                    <span class="text-emerald-400 font-bold border-b-2 border-emerald-400 pb-1">Thesis 🎓</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-grow container mx-auto px-4 py-12 max-w-7xl">
+        <!-- Header -->
+        <div class="mb-12">
+            <div class="flex items-center gap-3 text-emerald-400 text-xs font-mono mb-2">
+                <span class="bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20"><i
+                        class="fas fa-microchip mr-1"></i> AI POWERED</span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-400">Restricted Access Page</span>
+            </div>
+            <h1 class="text-5xl font-display font-black text-white tracking-tight">Master's Thesis</h1>
+            <p class="text-slate-400 text-lg mt-2 max-w-2xl">A comprehensive study on ReAct-based AI agents for
+                financial analysis in the Norwegian market.</p>
+        </div>
+
+        <!-- Analysis Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Sentiment Card -->
+            <div class="glass-card rounded-2xl p-6 hover:border-emerald-500/30 transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <div
+                        class="h-12 w-12 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400">
+                        <i class="fas fa-brain text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-500 uppercase">Real-time</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Market Sentiment</h3>
+                <p class="text-slate-400 text-sm mb-6">Aggregate sentiment analysis from OSEBX news and global energy
+                    markets.</p>
+                <div class="flex items-end gap-2">
+                    <span class="text-3xl font-bold text-emerald-400">Bullish</span>
+                    <span class="text-slate-500 text-sm mb-1 pb-1">84% Confidence</span>
+                </div>
+            </div>
+
+            <!-- Inflation Outlook -->
+            <div class="glass-card rounded-2xl p-6 hover:border-cyan-500/30 transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="h-12 w-12 bg-cyan-500/10 rounded-xl flex items-center justify-center text-cyan-400">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-500 uppercase">Predictive</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Inflation Forecast</h3>
+                <p class="text-slate-400 text-sm mb-6">12-month consumer price index projections based on current SSB
+                    trends.</p>
+                <div class="flex items-end gap-2">
+                    <span class="text-3xl font-bold text-cyan-400">+3.2%</span>
+                    <span class="text-slate-500 text-sm mb-1 pb-1">Target: 2.0%</span>
+                </div>
+            </div>
+
+            <!-- Spending Efficiency -->
+            <div class="glass-card rounded-2xl p-6 hover:border-purple-500/30 transition-all duration-300">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="h-12 w-12 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
+                        <i class="fas fa-wallet text-xl"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-500 uppercase">Personalized</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Spending Efficiency</h3>
+                <p class="text-slate-400 text-sm mb-6">Comparison of your uploaded statements against national household
+                    averages.</p>
+                <div class="flex items-end gap-2">
+                    <span class="text-3xl font-bold text-purple-400">Optimal</span>
+                    <span class="text-slate-500 text-sm mb-1 pb-1">Top 15%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="mt-12 glass-card rounded-2xl p-8 border-emerald-500/20 bg-emerald-500/5">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="h-3 w-3 bg-emerald-500 rounded-full"></div>
+                        <div class="absolute inset-0 h-3 w-3 bg-emerald-500 rounded-full animate-ping"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold">Analysis Engine Active</h4>
+                        <p class="text-slate-400 text-xs">All agents (Norfain-Baseline & Norfain-ReAct) synchronized.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="text-right">
+                        <p class="text-slate-500 text-[10px] uppercase font-mono">Server Status</p>
+                        <p class="text-emerald-400 font-bold tabular-nums">12ms Latency</p>
+                    </div>
+                    <div class="border-l border-white/10 pl-4 text-right">
+                        <p class="text-slate-500 text-[10px] uppercase font-mono">API Version</p>
+                        <p class="text-white font-bold tabular-nums">v2.4.0-stable</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

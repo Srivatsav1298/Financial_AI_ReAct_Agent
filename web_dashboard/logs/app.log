@@ -1,0 +1,119 @@
+2026-03-28 16:14:51,262 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:14:51,262 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:14:54,745 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:17:27,512 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:17:27,512 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:17:28,903 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:17:28,929 - __main__ - INFO - Starting with Waitress WSGI server
+2026-03-28 16:19:21,614 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:19:21,615 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:19:23,062 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:19:23,089 - __main__ - INFO - Starting with Waitress WSGI server
+2026-03-28 16:19:23,089 - __main__ - ERROR - Waitress failed to start: [Errno 48] Address already in use
+Traceback (most recent call last):
+  File "/Users/vatsavabbu/Desktop/Norfain/web_dashboard/app.py", line 839, in <module>
+    waitress.serve(app,
+    ~~~~~~~~~~~~~~^^^^^
+                  host='0.0.0.0',
+                  ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+                  connection_limit=100,
+                  ^^^^^^^^^^^^^^^^^^^^^
+                  channel_timeout=Config.REQUEST_TIMEOUT)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/__init__.py", line 13, in serve
+    server = _server(app, **kw)
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/server.py", line 78, in create_server
+    last_serv = TcpWSGIServer(
+        application,
+    ...<5 lines>...
+        sockinfo=sockinfo,
+    )
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/server.py", line 243, in __init__
+    self.bind_server_socket()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/server.py", line 364, in bind_server_socket
+    self.bind(sockaddr)
+    ~~~~~~~~~^^^^^^^^^^
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/wasyncore.py", line 374, in bind
+    return self.socket.bind(addr)
+           ~~~~~~~~~~~~~~~~^^^^^^
+OSError: [Errno 48] Address already in use
+2026-03-28 16:19:23,091 - __main__ - WARNING - Falling back to Flask dev server...
+2026-03-28 16:20:17,734 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:20:17,734 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:20:19,197 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:20:19,224 - __main__ - INFO - Starting with Waitress WSGI server
+2026-03-28 16:20:19,225 - waitress - INFO - Serving on http://0.0.0.0:5050
+2026-03-28 16:21:00,010 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:21:00,011 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:21:01,443 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:21:01,471 - __main__ - INFO - Starting with Waitress WSGI server
+2026-03-28 16:21:01,472 - __main__ - ERROR - Waitress failed to start: [Errno 48] Address already in use
+Traceback (most recent call last):
+  File "/Users/vatsavabbu/Desktop/Norfain/web_dashboard/app.py", line 839, in <module>
+    waitress.serve(app,
+    ~~~~~~~~~~~~~~^^^^^
+                  host='0.0.0.0',
+                  ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+                  connection_limit=100,
+                  ^^^^^^^^^^^^^^^^^^^^^
+                  channel_timeout=Config.REQUEST_TIMEOUT)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/__init__.py", line 13, in serve
+    server = _server(app, **kw)
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/server.py", line 78, in create_server
+    last_serv = TcpWSGIServer(
+        application,
+    ...<5 lines>...
+        sockinfo=sockinfo,
+    )
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/server.py", line 243, in __init__
+    self.bind_server_socket()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/server.py", line 364, in bind_server_socket
+    self.bind(sockaddr)
+    ~~~~~~~~~^^^^^^^^^^
+  File "/Users/vatsavabbu/Desktop/Norfain/nvenv/lib/python3.13/site-packages/waitress/wasyncore.py", line 374, in bind
+    return self.socket.bind(addr)
+           ~~~~~~~~~~~~~~~~^^^^^^
+OSError: [Errno 48] Address already in use
+2026-03-28 16:21:01,473 - __main__ - WARNING - Falling back to Flask dev server...
+2026-03-28 16:26:22,270 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:26:22,270 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:26:23,719 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:26:23,748 - __main__ - INFO - Starting with Waitress WSGI server
+2026-03-28 16:26:23,749 - waitress - INFO - Serving on http://0.0.0.0:5050
+2026-03-28 16:29:26,610 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:29:30,861 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:31:38,624 - __main__ - INFO - 📝 Processing: How much do Norwegian families spend on housing?... (lang=en)
+2026-03-28 16:31:39,688 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:31:53,230 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:32:27,469 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:33:01,378 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:33:03,070 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:33:36,910 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:34:08,340 - __main__ - INFO - ✅ Completed in 149.734s (B:9.100s, R:140.614s)
+2026-03-28 16:34:08,709 - __main__ - INFO - ✅ Cache HIT: How much do Norwegian families spend on housing?...
+2026-03-28 16:39:16,666 - __main__ - INFO - CORS in development mode (localhost only)
+2026-03-28 16:39:16,667 - __main__ - INFO - 🚀 Initializing agents...
+2026-03-28 16:39:18,607 - __main__ - INFO - ✅ Agents initialized successfully
+2026-03-28 16:39:18,635 - __main__ - INFO - Starting with Waitress WSGI server
+2026-03-28 16:39:18,636 - waitress - INFO - Serving on http://0.0.0.0:5050
+2026-03-28 16:39:51,641 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 16:39:56,317 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:07:56,902 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:08:03,583 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:08:40,878 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:08:42,147 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:08:46,197 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:09:23,831 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:27:35,109 - __main__ - INFO - 📝 Processing: I earn 45000 NOK/month with housing 15000, food 8000, transport 6000, entertainment 3000, and other ... (lang=en)
+2026-03-28 17:27:37,079 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:27:53,887 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:28:19,167 - __main__ - INFO - ✅ Completed in 44.097s (B:14.564s, R:29.482s)
+2026-03-28 17:30:43,812 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:30:45,554 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:30:50,439 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-03-28 17:31:30,726 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"

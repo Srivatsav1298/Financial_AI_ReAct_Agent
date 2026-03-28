@@ -5,10 +5,20 @@ langchain-anthropic==0.1.1
 langgraph==0.0.20
 langchain-ollama
 
-
 # Data Processing
 requests==2.31.0
 pyjstat==2.4.0
+urllib3==2.4.0
+
+# Web Framework & Production Server
+flask==3.0.0
+flask-cors==4.0.0
+waitress==2.0.0
+
+# Production Enhancements (optional, recommended)
+# Install with: pip install -r requirements.txt
+# flask-limiter==3.5.0  # Advanced rate limiting
+# flask-talisman==1.1.0  # Security headers (we implemented manually)
 
 # Visualization
 matplotlib==3.8.2

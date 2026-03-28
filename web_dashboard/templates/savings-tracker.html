@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Tracker | Norfain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-white pb-20">
+    <!-- Nav -->
+    <nav class="border-b border-white/10 bg-slate-900/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+            <span
+                class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent cursor-pointer"
+                onclick="location.href='/'">Norfain</span>
+            <div class="flex gap-4 text-sm">
+                <a href="/" class="text-gray-400 hover:text-white">Dashboard</a>
+                <a href="/groceries" class="text-gray-400 hover:text-white">Matbørsen</a>
+                <a href="/prisjakt" class="text-gray-400 hover:text-white">Prisjakt</a>
+                <a href="#" class="text-emerald-400 border-b-2 border-emerald-400">Savings 💰</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">Savings & Goals Tracker</h1>
+                <p class="text-slate-400">Track financial goals with inflation-adjusted targets in NOK</p>
+            </div>
+            <button onclick="openCreate()" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-bold">
+                <i class="fas fa-plus mr-2"></i>Create Goal
+            </button>
+        </div>
+
+        <!-- Summary -->
+        <div id="summary" class="grid grid-cols-4 gap-4 mb-8"></div>
+
+        <!-- Goals -->
+        <div id="goals" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-20">
+                <i class="fas fa-spinner fa-spin text-4xl text-emerald-500"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal fixed inset-0 bg-black/50 z-50 items-center justify-center">
+        <div class="glass rounded-2xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-6">Create Goal</h2>
+            <form id="form" class="space-y-4" onsubmit="saveGoal(event)">
+                <input type="text" id="name" placeholder="Goal Name" required
+                    class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2">
+                <select id="type" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2">
+                    <option value="emergency">💰 Emergency Fund</option>
+                    <option value="vacation">✈️ Vacation</option>
+                    <option value="home">🏠 Home</option>
+                    <option value="education">🎓 Education</option>
+                </select>
+                <input type="number" id="amount" placeholder="Target Amount (NOK)" required min="0"
+                    class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2">
+                <input type="date" id="date" required
+                    class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2">
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal()"
+                        class="flex-1 bg-slate-700 hover:bg-slate-600 rounded-lg py-2">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 bg-emerald-500 hover:bg-emerald-600 rounded-lg py-2 font-bold">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let goals = [];
+
+        async function loadGoals() {
+            const res = await fetch('/api/goals');
+            const data = await res.json();
+            if (data.success) {
+                goals = data.goals;
+                renderSummary(data.summary);
+                renderGoals();
+            }
+        }
+
+        function renderSummary(s) {
+            document.getElementById('summary').innerHTML = `
+                <div class="glass rounded-xl p-4">
+                    <p class="text-slate-400 text-sm">Total Target</p>
+                    <p class="text-2xl font-bold">${s.total_target.toLocaleString()} NOK</p>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <p class="text-slate-400 text-sm">Total Saved</p>
+                    <p class="text-2xl font-bold text-emerald-400">${s.total_saved.toLocaleString()} NOK</p>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <p class="text-slate-400 text-sm">Progress</p>
+                    <p class="text-2xl font-bold">${s.total_progress}%</p>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <p class="text-slate-400 text-sm">Active Goals</p>
+                    <p class="text-2xl font-bold">${s.goal_count}</p>
+                </div>
+            `;
+        }
+
+        function renderGoals() {
+            const grid = document.getElementById('goals');
+            if (goals.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-20">
+                        <i class="fas fa-piggy-bank text-6xl text-slate-600 mb-4"></i>
+                        <h3 class="text-2xl font-bold mb-2">No Goals Yet</h3>
+                        <button onclick="openCreate()" class="px-6 py-3 bg-emerald-500 rounded-lg mt-4">Create First Goal</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = goals.map(g => {
+                const color = g.status === 'completed' ? 'emerald' : g.status === 'on_track' ? 'blue' : g.status === 'behind' ? 'yellow' : 'red';
+                return `
+                    <div class="glass rounded-xl p-6 hover:border-${color}-500/30 transition">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold">${g.name}</h3>
+                                <p class="text-sm text-slate-400">${g.goal_type}</p>
+                            </div>
+                            <button onclick="deleteGoal('${g.id}')" class="text-red-400 hover:text-red-300">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>${g.current_amount.toLocaleString()} NOK</span>
+                                <span>${g.target_amount.toLocaleString()} NOK</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-3">
+                                <div class="progress-bar bg-${color}-500 h-3 rounded-full" style="width: ${Math.min(g.progress, 100)}%"></div>
+                            </div>
+                            <p class="text-center text-sm mt-2 font-bold text-${color}-400">${g.progress}%</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+                            <div class="bg-slate-800/50 rounded p-2">
+                                <p class="text-slate-500">Months Left</p>
+                                <p class="font-bold">${g.months_remaining}</p>
+                            </div>
+                            <div class="bg-slate-800/50 rounded p-2">
+                                <p class="text-slate-500">Monthly Need</p>
+                                <p class="font-bold">${g.monthly_needed.toLocaleString()} NOK</p>
+                            </div>
+                        </div>
+
+                        ${g.inflation_impact > 0 ? `
+                            <div class="bg-red-500/10 border border-red-500/20 rounded p-2 mb-4 text-xs">
+                                <i class="fas fa-exclamation-triangle text-red-400 mr-1"></i>
+                                Inflation impact: +${g.inflation_impact.toLocaleString()} NOK
+                            </div>
+                        ` : ''}
+
+                        <button onclick="contribute('${g.id}')" class="w-full bg-emerald-500 hover:bg-emerald-600 rounded-lg py-2 font-bold">
+                            <i class="fas fa-plus mr-2"></i>Add Contribution
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openCreate() {
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('form').reset();
+        }
+
+        async function saveGoal(e) {
+            e.preventDefault();
+            const goal = {
+                name: document.getElementById('name').value,
+                goal_type: document.getElementById('type').value,
+                target_amount: parseFloat(document.getElementById('amount').value),
+                target_date: document.getElementById('date').value
+            };
+
+            const res = await fetch('/api/goals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(goal)
+            });
+
+            if (res.ok) {
+                closeModal();
+                loadGoals();
+            }
+        }
+
+        async function deleteGoal(id) {
+            if (!confirm('Delete this goal?')) return;
+            await fetch(`/api/goals/${id}`, { method: 'DELETE' });
+            loadGoals();
+        }
+
+        async function contribute(id) {
+            const amount = prompt('Enter contribution amount (NOK):');
+            if (!amount) return;
+
+            await fetch(`/api/goals/${id}/contribute`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: parseFloat(amount) })
+            });
+            loadGoals();
+        }
+
+        // Handle context from Activation Flow
+        window.onload = function () {
+            loadGoals();
+
+            // Check for context from dashboard
+            const context = localStorage.getItem('norfain_context');
+            if (context) {
+                try {
+                    const data = JSON.parse(context);
+                    // Only use context if it's recent (within last 10 seconds)
+                    if (Date.now() - data.timestamp < 10000) {
+                        // Show context banner
+                        setTimeout(() => {
+                            const goalsContainer = document.getElementById('goals');
+                            if (goalsContainer && goalsContainer.children.length === 0) {
+                                // No goals exist - show create prompt
+                                showCreateGoalPrompt();
+                            } else {
+                                // Goals exist - highlight inflation values
+                                highlightInflationValues();
+                            }
+                        }, 1000);
+
+                        // Clear context after use
+                        localStorage.removeItem('norfain_context');
+                    }
+                } catch (e) {
+                    console.error('Failed to parse context:', e);
+                }
+            }
+        };
+
+        // Show create goal prompt
+        function showCreateGoalPrompt() {
+            const banner = document.createElement('div');
+            banner.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 z-40 glass-card p-4 rounded-xl border border-yellow-500/30 shadow-2xl max-w-md';
+            banner.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-shield-alt text-yellow-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-white">Create a goal to protect your savings from inflation</p>
+                        <p class="text-xs text-slate-400 mt-1">Norfain will automatically adjust targets as prices change</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-slate-500 hover:text-white">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(banner);
+
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 300);
+            }, 10000);
+        }
+
+        // Highlight inflation-adjusted values
+        function highlightInflationValues() {
+            const inflationBadges = document.querySelectorAll('.text-red-400');
+            inflationBadges.forEach(badge => {
+                badge.classList.add('animate-pulse');
+                setTimeout(() => badge.classList.remove('animate-pulse'), 3000);
+            });
+        }
+    </script>
+</body>
+
+</html>
