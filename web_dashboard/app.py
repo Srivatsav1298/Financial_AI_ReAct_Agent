@@ -12,7 +12,7 @@ import time
 import importlib
 
 # Add src to path (from root directory: Norfain/src)
-sys.path.append(str(Path(__file__).parent.parent.parent / "src"))
+sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 # Import agent modules
 from agents import baseline
