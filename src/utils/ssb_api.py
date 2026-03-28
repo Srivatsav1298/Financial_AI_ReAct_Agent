@@ -4,9 +4,10 @@ Handles all interactions with Statistics Norway's open data API
 """
 
 import json
-from typing import Dict, List, Optional, Any
 import time
+import threading
 from pathlib import Path
+from typing import Dict, List, Optional, Any
 import urllib.request
 import urllib.error
 import logging
@@ -19,10 +20,12 @@ class SSBApi:
     """Wrapper for Statistics Norway API"""
     
     def __init__(self, base_url: str = "https://data.ssb.no/api/v0", cache_dir: str = "data/ssb_cache"):
-        self.base_url = base_url
+        self.base_url = base_url.rstrip('/')
         self.cache_dir = Path(cache_dir)
-        # self.cache_dir.mkdir(parents=True, exist_ok=True) # Not using file cache for now
-        self.cache = {} # In-memory cache
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        # In-memory cache with TTL support
+        self._memory_cache = {}
+        self._cache_lock = threading.RLock() if 'threading' in globals() else None
         
     def _get_cache_path(self, table_id: str, query_hash: str) -> Path:
         """Generate cache file path"""
