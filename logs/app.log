@@ -1,0 +1,21 @@
+2026-03-30 19:26:55,551 - app - INFO - ✅ Logging configured (level: DEBUG)
+2026-03-30 19:26:55,565 - app - INFO - ✅ Compression enabled (gzip/brotli)
+2026-03-30 19:26:55,566 - app - INFO - ✅ Cache initialized: simple
+2026-03-30 19:26:55,566 - app - INFO - ✅ CORS restricted to: ['http://localhost:5000', 'http://127.0.0.1:5000', 'http://localhost:5050']
+2026-03-30 19:26:55,593 - app - INFO - ✅ Metrics middleware registered
+2026-03-30 19:26:55,593 - app - INFO - ✅ Security headers registered
+2026-03-30 19:26:55,593 - app - INFO - ✅ Rate limiting enabled
+2026-03-30 19:26:55,593 - app - INFO - 🔧 Initializing agents and services...
+2026-03-30 19:26:55,594 - app - INFO - ✅ SSB API initialized
+2026-03-30 19:26:56,146 - app - INFO - ✅ Agents initialized
+2026-03-30 19:26:56,150 - app - INFO - ✅ All services initialized successfully
+2026-03-30 19:26:56,156 - app - INFO - ✅ All blueprints registered
+2026-03-30 19:26:56,157 - app - INFO - ================================================================================
+2026-03-30 19:26:56,157 - app - INFO - 🚀 NORFAIN REACT AGENT - PRODUCTION DASHBOARD
+2026-03-30 19:26:56,157 - app - INFO - ================================================================================
+2026-03-30 19:26:56,157 - app - INFO - 📡 Dashboard URL: http://localhost:5050
+2026-03-30 19:26:56,157 - app - INFO - 🔒 Debug: True
+2026-03-30 19:26:56,157 - app - INFO - ⚡ Cache: ✅ simple
+2026-03-30 19:26:56,157 - app - INFO - 📊 Metrics: /api/metrics (Prometheus format)
+2026-03-30 19:26:56,157 - app - INFO - 📝 Logs: logs/app.log
+2026-03-30 19:26:56,157 - app - INFO - ================================================================================

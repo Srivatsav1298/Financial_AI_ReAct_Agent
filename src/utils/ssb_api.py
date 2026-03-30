@@ -73,9 +73,9 @@ class SSBApi:
             query: Query specification (JSON format)
         Post query to SSB API for a specific table
         """
-        if use_cache and table_id in self.cache:
+        if use_cache and table_id in self._memory_cache:
             # Simple cache for demo purposes
-            return self.cache[table_id]
+            return self._memory_cache[table_id]
             
         url = f"{self.base_url}/en/table/{table_id}"
         
@@ -93,7 +93,7 @@ class SSBApi:
                     data = json.loads(response_body)
                     
                     if use_cache:
-                        self.cache[table_id] = data
+                        self._memory_cache[table_id] = data
                         
                     return data
                 else:
