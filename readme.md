@@ -62,8 +62,7 @@ norfain/
 │   ├── tools/           # LangChain tools for SSB & Retail
 │   └── utils/           # SSB API wrapper & matching logic
 ├── experiments/
-│   └── web_dashboard/   # Advanced Flask/Tailwind Dashboard (Full Product)
-├── web_dashboard/       # Simple Baseline Dashboard
+│   └── web_dashboard/   # Norfain Web Dashboard (Full Product)
 ├── results/             # Evaluation & Benchmark reports
 └── paper/               # Research paper & documentation
 ```
