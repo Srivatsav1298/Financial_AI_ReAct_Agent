@@ -1,0 +1,120 @@
+# Norfain ReAct Agent - Docker Compose Development Stack
+version: '3.8'
+
+services:
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: norfain-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - norfain-network
+
+  # Main Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: norfain-web
+    ports:
+      - "5050:5050"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=false
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - CACHE_ENABLED=true
+      - CACHE_TYPE=redis
+      - CACHE_REDIS_URL=redis://redis:6379/0
+      - RATELIMIT_ENABLED=true
+      - RATELIMIT_STORAGE_URL=redis://redis:6379/0
+      - ALLOWED_ORIGINS=http://localhost:5050
+      - AGENT_MODEL=${AGENT_MODEL:-llama3.2:latest}
+      - SSB_API_BASE_URL=https://data.ssb.no/api/v0
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - norfain-network
+    restart: unless-stopped
+
+  # Optional: Ollama Service for Local LLM
+  # Uncomment to use local Ollama instead of cloud APIs
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: norfain-ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama:/root/.ollama
+  #   networks:
+  #     - norfain-network
+  #   restart: unless-stopped
+  #   # Pull the model on first run
+  #   command: serve
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+  # Optional: Prometheus for metrics collection
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: norfain-prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #   networks:
+  #     - norfain-network
+  #   restart: unless-stopped
+
+  # Optional: Grafana for dashboards
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: norfain-grafana
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+  #   networks:
+  #     - norfain-network
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - prometheus
+
+volumes:
+  redis_data:
+  # ollama:
+  # prometheus_data:
+  # grafana_data:
+
+networks:
+  norfain-network:
+    driver: bridge
